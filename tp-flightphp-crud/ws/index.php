@@ -1,10 +1,15 @@
 <?php
 require 'vendor/autoload.php';
 require 'db.php';
+// require_once 'departement_routes.php';
+// require_once 'etablissement_routes.php';
+// require_once 'type_pret_routes.php';
+// require_once 'user_routes.php';
+// require_once 'client_routes.php';
+// require_once 'employe_routes.php';
 
-Flight::route('GET /', function() {
-    readfile('../index.html');
-});
+// Configure Flight pour utiliser le dossier views
+Flight::set('flight.views.path', __DIR__ . '/views');
 
 // Enable CORS for development
 Flight::before('start', function() {
@@ -24,6 +29,92 @@ Flight::map('json', function($data, $code = 200, $options = JSON_UNESCAPED_UNICO
         ->header('Content-Type', 'application/json')
         ->write(json_encode($data, $options))
         ->send();
+});
+
+// Route pour la page d'accueil (servir fichier HTML statique)
+Flight::route('GET /', function() {
+    $file = Flight::get('flight.views.path') . '/index.html';
+    if (file_exists($file)) {
+        Flight::response()
+            ->header('Content-Type', 'text/html')
+            ->write(file_get_contents($file))
+            ->send();
+    } else {
+        Flight::halt(404, 'Page not found');
+    }
+});
+
+// Routes pour les autres pages (similaires)
+Flight::route('GET /departements', function() {
+    $file = Flight::get('flight.views.path') . '/departements.html';
+    if (file_exists($file)) {
+        Flight::response()
+            ->header('Content-Type', 'text/html')
+            ->write(file_get_contents($file))
+            ->send();
+    } else {
+        Flight::halt(404, 'Page not found');
+    }
+});
+
+Flight::route('GET /etablissements', function() {
+    $file = Flight::get('flight.views.path') . '/etablissements.html';
+    if (file_exists($file)) {
+        Flight::response()
+            ->header('Content-Type', 'text/html')
+            ->write(file_get_contents($file))
+            ->send();
+    } else {
+        Flight::halt(404, 'Page not found');
+    }
+});
+
+Flight::route('GET /prets', function() {
+    $file = Flight::get('flight.views.path') . '/prets.html';
+    if (file_exists($file)) {
+        Flight::response()
+            ->header('Content-Type', 'text/html')
+            ->write(file_get_contents($file))
+            ->send();
+    } else {
+        Flight::halt(404, 'Page not found');
+    }
+});
+
+Flight::route('GET /users', function() {
+    $file = Flight::get('flight.views.path') . '/users.html';
+    if (file_exists($file)) {
+        Flight::response()
+            ->header('Content-Type', 'text/html')
+            ->write(file_get_contents($file))
+            ->send();
+    } else {
+        Flight::halt(404, 'Page not found');
+    }
+});
+
+Flight::route('GET /clients', function() {
+    $file = Flight::get('flight.views.path') . '/clients.html';
+    if (file_exists($file)) {
+        Flight::response()
+            ->header('Content-Type', 'text/html')
+            ->write(file_get_contents($file))
+            ->send();
+    } else {
+        Flight::halt(404, 'Page not found');
+    }
+});
+
+Flight::route('GET /employees', function() {
+    $file = Flight::get('flight.views.path') . '/employees.html';
+    if (file_exists($file)) {
+        Flight::response()
+            ->header('Content-Type', 'text/html')
+            ->write(file_get_contents($file))
+            ->send();
+    } else {
+        Flight::halt(404, 'Page not found');
+    }
 });
 
 // Admin Login
@@ -54,8 +145,7 @@ Flight::route('POST /ws/login', function() {
 // Financial Establishment Funds
 Flight::route('GET /ws/funds', function() {
     $db = getDB();
-
-System: db->query("SELECT ef.*, e.designation FROM Etablissement_Fond ef JOIN Etablissement e ON ef.id_etab = e.id");
+    $stmt = $db->query("SELECT ef.*, e.designation FROM Etablissement_Fond ef JOIN Etablissement e ON ef.id_etab = e.id");
     Flight::json($stmt->fetchAll(PDO::FETCH_ASSOC));
 });
 
