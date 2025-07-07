@@ -1,17 +1,17 @@
 // Données simulées pour chaque entité
 let departements = [
-    { id: 1, nom: "Informatique", description: "Département d'informatique", responsable: "Dr. Dupont" },
-    { id: 2, nom: "Mathématiques", description: "Département de mathématiques", responsable: "Mme. Martin" }
+    { id: 1, nom: "Administration", description: "Département administratif", responsable: "Dr. Dupont" },
+    { id: 2, nom: "Finance", description: "Département financier", responsable: "Mme. Martin" }
 ];
 
 let etablissements = [
-    { id: 1, nom: "Université de Paris", adresse: "123 Rue Exemple", ville: "Paris", code_postal: "75001" },
-    { id: 2, nom: "École Normale", adresse: "456 Avenue Test", ville: "Lyon", code_postal: "69001" }
+    { id: 1, nom: "Banque Centrale", adresse: "123 Rue de la Finance, Paris", ville: "Paris", code_postal: "75001" },
+    { id: 2, nom: "Agence Lyon", adresse: "456 Avenue Test", ville: "Lyon", code_postal: "69001" }
 ];
 
 let prets = [
-    { id: 1, etudiant_id: 1, materiel: "Livre", date_pret: "2025-01-01", date_retour: "2025-01-15" },
-    { id: 2, etudiant_id: 2, materiel: "Ordinateur", date_pret: "2025-02-01", date_retour: "2025-02-15" }
+    { id: 1, id_client: 1, id_etab: 1, id_pret_type: 1, montant: 50000.00, date: "2025-07-03" },
+    { id: 2, id_client: 2, id_etab: 1, id_pret_type: 1, montant: 75000.00, date: "2025-07-04" }
 ];
 
 // Fonction pour afficher les données dans un tableau
@@ -44,7 +44,8 @@ function handleFormSubmit(formId, tableId, dataArray, fields, endpoint) {
         const id = parseInt(document.getElementById(`${formId.split('-')[0]}-id`).value);
         const newItem = {};
         fields.forEach(field => {
-            newItem[field] = document.getElementById(field).value;
+            const value = document.getElementById(field).value;
+            newItem[field] = field.includes('montant') ? parseFloat(value) : (field.includes('id_') ? parseInt(value) : value);
         });
 
         if (id) {
@@ -78,7 +79,7 @@ function editItem(tableId, id) {
         fields = ['nom', 'adresse', 'ville', 'code_postal'];
     } else if (tableId === 'pret-table') {
         dataArray = prets;
-        fields = ['etudiant_id', 'materiel', 'date_pret', 'date_retour'];
+        fields = ['id_client', 'id_etab', 'id_pret_type', 'montant', 'date'];
     }
 
     const item = dataArray.find(item => item.id === id);
@@ -102,7 +103,7 @@ function deleteItem(tableId, id) {
         // TODO: Appeler DELETE /etablissements/@id
     } else if (tableId === 'pret-table') {
         prets = prets.filter(item => item.id !== id);
-        displayData('pret-table', prets, ['id', 'etudiant_id', 'materiel', 'date_pret', 'date_retour']);
+        displayData('pret-table', prets, ['id', 'id_client', 'id_etab', 'id_pret_type', 'montant', 'date']);
         // TODO: Appeler DELETE /prets/@id
     }
 }
@@ -116,7 +117,7 @@ document.addEventListener('DOMContentLoaded', () => {
         displayData('etablissement-table', etablissements, ['id', 'nom', 'adresse', 'ville', 'code_postal']);
         handleFormSubmit('etablissement-form', 'etablissement-table', etablissements, ['nom', 'adresse', 'ville', 'code_postal'], 'etablissements');
     } else if (document.getElementById('pret-table')) {
-        displayData('pret-table', prets, ['id', 'etudiant_id', 'materiel', 'date_pret', 'date_retour']);
-        handleFormSubmit('pret-form', 'pret-table', prets, ['etudiant_id', 'materiel', 'date_pret', 'date_retour'], 'prets');
+        displayData('pret-table', prets, ['id', 'id_client', 'id_etab', 'id_pret_type', 'montant', 'date']);
+        handleFormSubmit('pret-form', 'pret-table', prets, ['id_client', 'id_etab', 'id_pret_type', 'montant', 'date'], 'prets');
     }
 });

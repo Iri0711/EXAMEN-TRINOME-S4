@@ -1,7 +1,6 @@
 <?php
 require 'vendor/autoload.php';
 require 'db.php';
-require 'routes/.php';
 
 Flight::route('GET /', function() {
     readfile('../index.html');
