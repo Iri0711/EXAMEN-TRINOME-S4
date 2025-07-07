@@ -2,23 +2,111 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gestion des Départements</title>
+    <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
-    <h1>Gestion des Départements</h1>
-    <a href="/">Retour à l'accueil</a>
-    <h2>Ajouter/Modifier un Département</h2>
-    <form>
-        <label>Nom :</label><input type="text" name="nom"><br>
-        <label>Description :</label><input type="text" name="description"><br>
-        <label>Responsable :</label><input type="text" name="responsable"><br>
-        <button type="submit">Enregistrer</button>
-    </form>
-    <h2>Liste des Départements</h2>
-    <table>
-        <tr>
-            <th>ID</th><th>Nom</th><th>Description</th><th>Responsable</th><th>Actions</th>
-        </tr>
-    </table>
+<body class="bg-gray-100 font-sans">
+    <header class="bg-blue-600 text-white p-4">
+        <h1 class="text-2xl font-bold">Gestion des Départements</h1>
+        <a href="/" class="text-white underline">Retour à l'accueil</a>
+    </header>
+    <main class="container mx-auto p-6">
+        <section class="mb-8">
+            <h2 class="text-xl font-semibold mb-4">Ajouter/Modifier un Département</h2>
+            <div class="bg-white p-4 rounded-lg shadow">
+                <div class="mb-4">
+                    <label for="designation" class="block text-sm font-medium text-gray-700">Désignation :</label>
+                    <input type="text" id="designation" class="mt-1 p-2 border rounded w-full" required>
+                </div>
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700">Autorisé :</label>
+                    <input type="radio" id="authorizedYes" name="authorized" value="Oui" class="mr-2">
+                    <label for="authorizedYes" class="mr-4">Oui</label>
+                    <input type="radio" id="authorizedNo" name="authorized" value="Non" class="mr-2">
+                    <label for="authorizedNo">Non</label>
+                </div>
+                <button onclick="saveDepartment()" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Enregistrer</button>
+            </div>
+        </section>
+        <section>
+            <h2 class="text-xl font-semibold mb-4">Liste des Départements</h2>
+            <table id="departmentsTable" class="min-w-full bg-white rounded-lg shadow">
+                <thead>
+                    <tr class="bg-gray-200">
+                        <th class="p-2 text-left">ID</th>
+                        <th class="p-2 text-left">Désignation</th>
+                        <th class="p-2 text-left">Autorisé</th>
+                        <th class="p-2 text-left">Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="departmentsTableBody"></tbody>
+            </table>
+        </section>
+    </main>
+    <script>
+        let departments = [
+            { id: 1, designation: "RH", authorized: "Oui" },
+            { id: 2, designation: "Finance", authorized: "Non" }
+        ];
+
+        function loadDepartments() {
+            const tableBody = document.getElementById('departmentsTableBody');
+            tableBody.innerHTML = '';
+            departments.forEach(dept => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td class="p-2">${dept.id}</td>
+                    <td class="p-2">${dept.designation}</td>
+                    <td class="p-2">${dept.authorized}</td>
+                    <td class="p-2">
+                        <button onclick="editDepartment(${dept.id})" class="bg-yellow-500 text-white px-2 py-1 rounded">Modifier</button>
+                        <button onclick="deleteDepartment(${dept.id})" class="bg-red-500 text-white px-2 py-1 rounded">Supprimer</button>
+                    </td>
+                `;
+                tableBody.appendChild(row);
+            });
+        }
+
+        function saveDepartment() {
+            const designation = document.getElementById('designation').value;
+            const authorized = document.querySelector('input[name="authorized"]:checked')?.value;
+            if (!designation || !authorized) {
+                alert('Veuillez remplir tous les champs.');
+                return;
+            }
+            const existingDepartment = departments.find(dept => dept.designation === designation);
+            if (existingDepartment) {
+                existingDepartment.designation = designation;
+                existingDepartment.authorized = authorized;
+            } else {
+                const newDepartment = {
+                    id: departments.length ? Math.max(...departments.map(d => d.id)) + 1 : 1,
+                    designation,
+                    authorized
+                };
+                departments.push(newDepartment);
+            }
+            document.getElementById('designation').value = '';
+            document.getElementById('authorizedYes').checked = false;
+            document.getElementById('authorizedNo').checked = false;
+            loadDepartments();
+        }
+
+        function editDepartment(id) {
+            const department = departments.find(d => d.id === id);
+            if (department) {
+                document.getElementById('designation').value = department.designation;
+                document.getElementById(department.authorized === 'Oui' ? 'authorizedYes' : 'authorizedNo').checked = true;
+            }
+        }
+
+        function deleteDepartment(id) {
+            departments = departments.filter(d => d.id !== id);
+            loadDepartments();
+        }
+
+        window.onload = loadDepartments;
+    </script>
 </body>
 </html>

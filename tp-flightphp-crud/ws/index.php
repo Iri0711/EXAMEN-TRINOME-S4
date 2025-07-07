@@ -1,17 +1,9 @@
 <?php
 require 'vendor/autoload.php';
 require 'db.php';
-// require_once 'departement_routes.php';
-// require_once 'etablissement_routes.php';
-// require_once 'type_pret_routes.php';
-// require_once 'user_routes.php';
-// require_once 'client_routes.php';
-// require_once 'employe_routes.php';
 
-// Configure Flight pour utiliser le dossier views
-Flight::set('flight.views.path', __DIR__ . '/views');
+Flight::set('flight.views.path', __DIR__ . 'views');
 
-// Enable CORS for development
 Flight::before('start', function() {
     header("Access-Control-Allow-Origin: *");
     header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS");
@@ -22,7 +14,7 @@ Flight::before('start', function() {
     }
 });
 
-// Format JSON responses
+// Format JSON responses with error handling
 Flight::map('json', function($data, $code = 200, $options = JSON_UNESCAPED_UNICODE) {
     Flight::response()
         ->status($code)
@@ -31,273 +23,645 @@ Flight::map('json', function($data, $code = 200, $options = JSON_UNESCAPED_UNICO
         ->send();
 });
 
-// Route pour la page d'accueil (servir fichier HTML statique)
+// Error handling for database operations
+Flight::map('error', function(Exception $ex) {
+    Flight::json(['error' => $ex->getMessage()], 500);
+});
+
+/****************************
+ * Routes pour les pages HTML
+ ****************************/
+
 Flight::route('GET /', function() {
-    $file = Flight::get('flight.views.path') . '/index.html';
-    if (file_exists($file)) {
-        Flight::response()
-            ->header('Content-Type', 'text/html')
-            ->write(file_get_contents($file))
-            ->send();
-    } else {
-        Flight::halt(404, 'Page not found');
+    try {
+        Flight::render('index.html');
+    } catch (Exception $e) {
+        Flight::error($e);
     }
 });
 
-// Routes pour les autres pages (similaires)
 Flight::route('GET /departements', function() {
-    $file = Flight::get('flight.views.path') . '/departements.html';
-    if (file_exists($file)) {
-        Flight::response()
-            ->header('Content-Type', 'text/html')
-            ->write(file_get_contents($file))
-            ->send();
-    } else {
-        Flight::halt(404, 'Page not found');
+    try {
+        Flight::render('departements.html');
+    } catch (Exception $e) {
+        Flight::error($e);
     }
 });
 
 Flight::route('GET /etablissements', function() {
-    $file = Flight::get('flight.views.path') . '/etablissements.html';
-    if (file_exists($file)) {
-        Flight::response()
-            ->header('Content-Type', 'text/html')
-            ->write(file_get_contents($file))
-            ->send();
-    } else {
-        Flight::halt(404, 'Page not found');
+    try {
+        Flight::render('etablissements.html');
+    } catch (Exception $e) {
+        Flight::error($e);
     }
 });
 
 Flight::route('GET /prets', function() {
-    $file = Flight::get('flight.views.path') . '/prets.html';
-    if (file_exists($file)) {
-        Flight::response()
-            ->header('Content-Type', 'text/html')
-            ->write(file_get_contents($file))
-            ->send();
-    } else {
-        Flight::halt(404, 'Page not found');
+    try {
+        Flight::render('prets.html');
+    } catch (Exception $e) {
+        Flight::error($e);
     }
 });
 
 Flight::route('GET /users', function() {
-    $file = Flight::get('flight.views.path') . '/users.html';
-    if (file_exists($file)) {
-        Flight::response()
-            ->header('Content-Type', 'text/html')
-            ->write(file_get_contents($file))
-            ->send();
-    } else {
-        Flight::halt(404, 'Page not found');
+    try {
+        Flight::render('users.html');
+    } catch (Exception $e) {
+        Flight::error($e);
     }
 });
 
 Flight::route('GET /clients', function() {
-    $file = Flight::get('flight.views.path') . '/clients.html';
-    if (file_exists($file)) {
-        Flight::response()
-            ->header('Content-Type', 'text/html')
-            ->write(file_get_contents($file))
-            ->send();
-    } else {
-        Flight::halt(404, 'Page not found');
+    try {
+        Flight::render('clients.html');
+    } catch (Exception $e) {
+        Flight::error($e);
     }
 });
 
 Flight::route('GET /employees', function() {
-    $file = Flight::get('flight.views.path') . '/employees.html';
-    if (file_exists($file)) {
-        Flight::response()
-            ->header('Content-Type', 'text/html')
-            ->write(file_get_contents($file))
-            ->send();
-    } else {
-        Flight::halt(404, 'Page not found');
+    try {
+        Flight::render('employees.html');
+    } catch (Exception $e) {
+        Flight::error($e);
     }
 });
 
-// Admin Login
-Flight::route('POST /ws/login', function() {
-    $request = Flight::request()->data;
-    $email = $request->email;
-    $password = $request->password;
+Flight::route('GET /interets', function() {
+    try {
+        Flight::render('interets.html');
+    } catch (Exception $e) {
+        Flight::error($e);
+    }
+});
 
-    $db = getDB();
-    $stmt = $db->prepare("SELECT * FROM User WHERE email = ?");
-    $stmt->execute([$email]);
-    $user = $stmt->fetch(PDO::FETCH_ASSOC);
+/****************************
+ * API Routes pour Départements
+ ****************************/
 
-    if ($user && password_verify($password, $user['mdp'])) {
-        $stmt = $db->prepare("SELECT * FROM Employe WHERE id_user = ?");
-        $stmt->execute([$user['id']]);
-        $employee = $stmt->fetch(PDO::FETCH_ASSOC);
-        if ($employee) {
-            Flight::json(['success' => true, 'user' => $user]);
+Flight::route('GET /api/departements', function() {
+    try {
+        $db = getDB();
+        $stmt = $db->query("SELECT * FROM departements");
+        Flight::json($stmt->fetchAll(PDO::FETCH_ASSOC));
+    } catch (Exception $e) {
+        Flight::error($e);
+    }
+});
+
+Flight::route('GET /api/departements/@id', function($id) {
+    try {
+        $db = getDB();
+        $stmt = $db->prepare("SELECT * FROM departements WHERE id = ?");
+        $stmt->execute([$id]);
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+        if ($result) {
+            Flight::json($result);
         } else {
-            Flight::json(['success' => false, 'message' => 'Not an employee']);
+            Flight::json(['error' => 'Département non trouvé'], 404);
         }
-    } else {
-        Flight::json(['success' => false, 'message' => 'Invalid credentials']);
+    } catch (Exception $e) {
+        Flight::error($e);
     }
 });
 
-// Financial Establishment Funds
-Flight::route('GET /ws/funds', function() {
-    $db = getDB();
-    $stmt = $db->query("SELECT ef.*, e.designation FROM Etablissement_Fond ef JOIN Etablissement e ON ef.id_etab = e.id");
-    Flight::json($stmt->fetchAll(PDO::FETCH_ASSOC));
+Flight::route('POST /api/departements', function() {
+    try {
+        $data = Flight::request()->data;
+        if (!isset($data->designation) || !isset($data->autorise)) {
+            Flight::json(['error' => 'Données incomplètes'], 400);
+            return;
+        }
+        $db = getDB();
+        $stmt = $db->prepare("INSERT INTO departements (designation, autorise) VALUES (?, ?)");
+        $stmt->execute([$data->designation, $data->autorise]);
+        Flight::json(['message' => 'Département créé', 'id' => $db->lastInsertId()], 201);
+    } catch (Exception $e) {
+        Flight::error($e);
+    }
 });
 
-Flight::route('POST /ws/funds', function() {
-    $data = Flight::request()->data;
-    $db = getDB();
-    $stmt = $db->prepare("INSERT INTO Etablissement_Fond (id_etab, montant, date, libelle) VALUES (?, ?, ?, ?)");
-    $stmt->execute([$data->id_etab, $data->montant, $data->date, $data->libelle]);
-    Flight::json(['message' => 'Fund added', 'id' => $db->lastInsertId()]);
+Flight::route('PUT /api/departements/@id', function($id) {
+    try {
+        $data = Flight::request()->data;
+        if (!isset($data->designation) || !isset($data->autorise)) {
+            Flight::json(['error' => 'Données incomplètes'], 400);
+            return;
+        }
+        $db = getDB();
+        $stmt = $db->prepare("UPDATE departements SET designation = ?, autorise = ? WHERE id = ?");
+        $stmt->execute([$data->designation, $data->autorise, $id]);
+        if ($stmt->rowCount() > 0) {
+            Flight::json(['message' => 'Département mis à jour']);
+        } else {
+            Flight::json(['error' => 'Département non trouvé'], 404);
+        }
+    } catch (Exception $e) {
+        Flight::error($e);
+    }
 });
 
-Flight::route('PUT /ws/funds/@id', function($id) {
-    $data = Flight::request()->data;
-    $db = getDB();
-    $stmt = $db->prepare("UPDATE Etablissement_Fond SET id_etab = ?, montant = ?, date = ?, libelle = ? WHERE id = ?");
-    $stmt->execute([$data->id_etab, $data->montant, $data->date, $data->libelle, $id]);
-    Flight::json(['message' => 'Fund updated']);
+Flight::route('DELETE /api/departements/@id', function($id) {
+    try {
+        $db = getDB();
+        $stmt = $db->prepare("DELETE FROM departements WHERE id = ?");
+        $stmt->execute([$id]);
+        if ($stmt->rowCount() > 0) {
+            Flight::json(['message' => 'Département supprimé']);
+        } else {
+            Flight::json(['error' => 'Département non trouvé'], 404);
+        }
+    } catch (Exception $e) {
+        Flight::error($e);
+    }
 });
 
-Flight::route('DELETE /ws/funds/@id', function($id) {
-    $db = getDB();
-    $stmt = $db->prepare("DELETE FROM Etablissement_Fond WHERE id = ?");
-    $stmt->execute([$id]);
-    Flight::json(['message' => 'Fund deleted']);
+/****************************
+ * API Routes pour Clients
+ ****************************/
+
+Flight::route('GET /api/clients', function() {
+    try {
+        $db = getDB();
+        $stmt = $db->query("SELECT * FROM clients");
+        Flight::json($stmt->fetchAll(PDO::FETCH_ASSOC));
+    } catch (Exception $e) {
+        Flight::error($e);
+    }
 });
 
-// Fund Validations
-Flight::route('GET /ws/validations', function() {
-    $db = getDB();
-    $stmt = $db->query("SELECT fv.*, ef.libelle FROM Fond_Validation fv JOIN Etablissement_Fond ef ON fv.id_etab_fond = ef.id");
-    Flight::json($stmt->fetchAll(PDO::FETCH_ASSOC));
+Flight::route('GET /api/clients/@id', function($id) {
+    try {
+        $db = getDB();
+        $stmt = $db->prepare("SELECT * FROM clients WHERE id = ?");
+        $stmt->execute([$id]);
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+        if ($result) {
+            Flight::json($result);
+        } else {
+            Flight::json(['error' => 'Client non trouvé'], 404);
+        }
+    } catch (Exception $e) {
+        Flight::error($e);
+    }
 });
 
-Flight::route('POST /ws/validations', function() {
-    $data = Flight::request()->data;
-    $db = getDB();
-    $stmt = $db->prepare("INSERT INTO Fond_Validation (id_etab_fond, statut, date) VALUES (?, ?, ?)");
-    $stmt->execute([$data->id_etab_fond, $data->statut, $data->date]);
-    Flight::json(['message' => 'Validation added', 'id' => $db->lastInsertId()]);
+Flight::route('POST /api/clients', function() {
+    try {
+        $data = Flight::request()->data;
+        if (!isset($data->id_user)) {
+            Flight::json(['error' => 'Données incomplètes'], 400);
+            return;
+        }
+        $db = getDB();
+        $stmt = $db->prepare("INSERT INTO clients (id_user) VALUES (?)");
+        $stmt->execute([$data->id_user]);
+        Flight::json(['message' => 'Client créé', 'id' => $db->lastInsertId()], 201);
+    } catch (Exception $e) {
+        Flight::error($e);
+    }
+});
+Flight::route('PUT /api/clients/@id', function($id) {
+    try {
+        $data = Flight::request()->data;
+        if (!isset($data->id_user)) {
+            Flight::json(['error' => 'Données incomplètes'], 400);
+            return;
+        }
+        $db = getDB();
+        $stmt = $db->prepare("UPDATE clients SET id_user = ? WHERE id = ?");
+        $stmt->execute([$data->id_user, $id]);
+        if ($stmt->rowCount() > 0) {
+            Flight::json(['message' => 'Client mis à jour']);
+        } else {
+            Flight::json(['error' => 'Client non trouvé'], 404);
+        }
+    } catch (Exception $e) {
+        Flight::error($e);
+    }
 });
 
-Flight::route('PUT /ws/validations/@id', function($id) {
-    $data = Flight::request()->data;
-    $db = getDB();
-    $stmt = $db->prepare("UPDATE Fond_Validation SET id_etab_fond = ?, statut = ?, date = ? WHERE id = ?");
-    $stmt->execute([$data->id_etab_fond, $data->statut, $data->date, $id]);
-    Flight::json(['message' => 'Validation updated']);
+Flight::route('DELETE /api/clients/@id', function($id) {
+    try {
+        $db = getDB();
+        $stmt = $db->prepare("DELETE FROM clients WHERE id = ?");
+        $stmt->execute([$id]);
+        if ($stmt->rowCount() > 0) {
+            Flight::json(['message' => 'Client supprimé']);
+        } else {
+            Flight::json(['error' => 'Client non trouvé'], 404);
+        }
+    } catch (Exception $e) {
+        Flight::error($e);
+    }
 });
 
-Flight::route('DELETE /ws/validations/@id', function($id) {
-    $db = getDB();
-    $stmt = $db->prepare("DELETE FROM Fond_Validation WHERE id = ?");
-    $stmt->execute([$id]);
-    Flight::json(['message' => 'Validation deleted']);
+/****************************
+ * API Routes pour Employés
+ ****************************/
+
+Flight::route('GET /api/employees', function() {
+    try {
+        $db = getDB();
+        $stmt = $db->query("SELECT * FROM employes");
+        Flight::json($stmt->fetchAll(PDO::FETCH_ASSOC));
+    } catch (Exception $e) {
+        Flight::error($e);
+    }
 });
 
-// Loan Types
-Flight::route('GET /ws/loan-types', function() {
-    $db = getDB();
-    $stmt = $db->query("SELECT * FROM Pret_Type");
-    Flight::json($stmt->fetchAll(PDO::FETCH_ASSOC));
+Flight::route('GET /api/employees/@id', function($id) {
+    try {
+        $db = getDB();
+        $stmt = $db->prepare("SELECT * FROM employes WHERE id = ?");
+        $stmt->execute([$id]);
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+        if ($result) {
+            Flight::json($result);
+        } else {
+            Flight::json(['error' => 'Employé non trouvé'], 404);
+        }
+    } catch (Exception $e) {
+        Flight::error($e);
+    }
 });
 
-Flight::route('POST /ws/loan-types', function() {
-    $data = Flight::request()->data;
-    $db = getDB();
-    $stmt = $db->prepare("INSERT INTO Pret_Type (libelle, taux, duree) VALUES (?, ?, ?)");
-    $stmt->execute([$data->libelle, $data->taux, $data->duree]);
-    Flight::json(['message' => 'Loan type added', 'id' => $db->lastInsertId()]);
+Flight::route('POST /api/employees', function() {
+    try {
+        $data = Flight::request()->data;
+        if (!isset($data->id_user) || !isset($data->id_departement)) {
+            Flight::json(['error' => 'Données incomplètes'], 400);
+            return;
+        }
+        $db = getDB();
+        $stmt = $db->prepare("INSERT INTO employes (id_user, id_departement) VALUES (?, ?)");
+        $stmt->execute([$data->id_user, $data->id_departement]);
+        Flight::json(['message' => 'Employé créé', 'id' => $db->lastInsertId()], 201);
+    } catch (Exception $e) {
+        Flight::error($e);
+    }
 });
 
-Flight::route('PUT /ws/loan-types/@id', function($id) {
-    $data = Flight::request()->data;
-    $db = getDB();
-    $stmt = $db->prepare("UPDATE Pret_Type SET libelle = ?, taux = ?, duree = ? WHERE id = ?");
-    $stmt->execute([$data->libelle, $data->taux, $data->duree, $id]);
-    Flight::json(['message' => 'Loan type updated']);
+Flight::route('PUT /api/employees/@id', function($id) {
+    try {
+        $data = Flight::request()->data;
+        if (!isset($data->id_user) || !isset($data->id_departement)) {
+            Flight::json(['error' => 'Données incomplètes'], 400);
+            return;
+        }
+        $db = getDB();
+        $stmt = $db->prepare("UPDATE employes SET id_user = ?, id_departement = ? WHERE id = ?");
+        $stmt->execute([$data->id_user, $data->id_departement, $id]);
+        if ($stmt->rowCount() > 0) {
+            Flight::json(['message' => 'Employé mis à jour']);
+        } else {
+            Flight::json(['error' => 'Employé non trouvé'], 404);
+        }
+    } catch (Exception $e) {
+        Flight::error($e);
+    }
 });
 
-Flight::route('DELETE /ws/loan-types/@id', function($id) {
-    $db = getDB();
-    $stmt = $db->prepare("DELETE FROM Pret_Type WHERE id = ?");
-    $stmt->execute([$id]);
-    Flight::json(['message' => 'Loan type deleted']);
+Flight::route('DELETE /api/employees/@id', function($id) {
+    try {
+        $db = getDB();
+        $stmt = $db->prepare("DELETE FROM employes WHERE id = ?");
+        $stmt->execute([$id]);
+        if ($stmt->rowCount() > 0) {
+            Flight::json(['message' => 'Employé supprimé']);
+        } else {
+            Flight::json(['error' => 'Employé non trouvé'], 404);
+        }
+    } catch (Exception $e) {
+        Flight::error($e);
+    }
 });
 
-// Client Loans
-Flight::route('GET /ws/client-loans', function() {
-    $db = getDB();
-    $stmt = $db->query("SELECT pc.*, c.id_user, e.designation, pt.libelle 
-                        FROM Pret_Client pc 
-                        JOIN Client c ON pc.id_client = c.id 
-                        JOIN Etablissement e ON pc.id_etab = e.id 
-                        JOIN Pret_Type pt ON pc.id_pret_type = pt.id");
-    Flight::json($stmt->fetchAll(PDO::FETCH_ASSOC));
+/****************************
+ * API Routes pour Établissements
+ ****************************/
+
+Flight::route('GET /api/etablissements', function() {
+    try {
+        $db = getDB();
+        $stmt = $db->query("SELECT * FROM etablissements");
+        Flight::json($stmt->fetchAll(PDO::FETCH_ASSOC));
+    } catch (Exception $e) {
+        Flight::error($e);
+    }
 });
 
-Flight::route('POST /ws/client-loans', function() {
-    $data = Flight::request()->data;
-    $db = getDB();
-    $stmt = $db->prepare("INSERT INTO Pret_Client (id_client, id_etab, id_pret_type, montant, date) 
-                         VALUES (?, ?, ?, ?, ?)");
-    $stmt->execute([$data->id_client, $data->id_etab, $data->id_pret_type, $data->montant, $data->date]);
-    Flight::json(['message' => 'Client loan added', 'id' => $db->lastInsertId()]);
+Flight::route('GET /api/etablissements/@id', function($id) {
+    try {
+        $db = getDB();
+        $stmt = $db->prepare("SELECT * FROM etablissements WHERE id = ?");
+        $stmt->execute([$id]);
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+        if ($result) {
+            Flight::json($result);
+        } else {
+            Flight::json(['error' => 'Établissement non trouvé'], 404);
+        }
+    } catch (Exception $e) {
+        Flight::error($e);
+    }
 });
 
-Flight::route('PUT /ws/client-loans/@id', function($id) {
-    $data = Flight::request()->data;
-    $db = getDB();
-    $stmt = $db->prepare("UPDATE Pret_Client SET id_client = ?, id_etab = ?, id_pret_type = ?, montant = ?, date = ? 
-                         WHERE id = ?");
-    $stmt->execute([$data->id_client, $data->id_etab, $data->id_pret_type, $data->montant, $data->date, $id]);
-    Flight::json(['message' => 'Client loan updated']);
+Flight::route('POST /api/etablissements', function() {
+    try {
+        $data = Flight::request()->data;
+        if (!isset($data->nom) || !isset($data->adresse) || !isset($data->ville) || !isset($data->code_postal)) {
+            Flight::json(['error' => 'Données incomplètes'], 400);
+            return;
+        }
+        $db = getDB();
+        $stmt = $db->prepare("INSERT INTO etablissements (nom, adresse, ville, code_postal) VALUES (?, ?, ?, ?)");
+        $stmt->execute([$data->nom, $data->adresse, $data->ville, $data->code_postal]);
+        Flight::json(['message' => 'Établissement créé', 'id' => $db->lastInsertId()], 201);
+    } catch (Exception $e) {
+        Flight::error($e);
+    }
 });
 
-Flight::route('DELETE /ws/client-loans/@id', function($id) {
-    $db = getDB();
-    $stmt = $db->prepare("DELETE FROM Pret_Client WHERE id = ?");
-    $stmt->execute([$id]);
-    Flight::json(['message' => 'Client loan deleted']);
+Flight::route('PUT /api/etablissements/@id', function($id) {
+    try {
+        $data = Flight::request()->data;
+        if (!isset($data->nom) || !isset($data->adresse) || !isset($data->ville) || !isset($data->code_postal)) {
+            Flight::json(['error' => 'Données incomplètes'], 400);
+            return;
+        }
+        $db = getDB();
+        $stmt = $db->prepare("UPDATE etablissements SET nom = ?, adresse = ?, ville = ?, code_postal = ? WHERE id = ?");
+        $stmt->execute([$data->nom, $data->adresse, $data->ville, $data->code_postal, $id]);
+        if ($stmt->rowCount() > 0) {
+            Flight::json(['message' => 'Établissement mis à jour']);
+        } else {
+            Flight::json(['error' => 'Établissement non trouvé'], 404);
+        }
+    } catch (Exception $e) {
+        Flight::error($e);
+    }
 });
 
-// Loan Repayments
-Flight::route('GET /ws/repayments', function() {
-    $db = getDB();
-    $stmt = $db->query("SELECT pr.*, pc.montant AS loan_amount 
-                        FROM Pret_Retour pr 
-                        JOIN Pret_Client pc ON pr.id_client_pret = pc.id");
-    Flight::json($stmt->fetchAll(PDO::FETCH_ASSOC));
+Flight::route('DELETE /api/etablissements/@id', function($id) {
+    try {
+        $db = getDB();
+        $stmt = $db->prepare("DELETE FROM etablissements WHERE id = ?");
+        $stmt->execute([$id]);
+        if ($stmt->rowCount() > 0) {
+            Flight::json(['message' => 'Établissement supprimé']);
+        } else {
+            Flight::json(['error' => 'Établissement non trouvé'], 404);
+        }
+    } catch (Exception $e) {
+        Flight::error($e);
+    }
 });
 
-Flight::route('POST /ws/repayments', function() {
-    $data = Flight::request()->data;
-    $db = getDB();
-    $stmt = $db->prepare("INSERT INTO Pret_Retour (id_client_pret, montant, date) VALUES (?, ?, ?)");
-    $stmt->execute([$data->id_client_pret, $data->montant, $data->date]);
-    Flight::json(['message' => 'Repayment added', 'id' => $db->lastInsertId()]);
+/****************************
+ * API Routes pour Intérêts
+ ****************************/
+
+Flight::route('GET /api/interets', function() {
+    try {
+        $db = getDB();
+        $stmt = $db->query("SELECT * FROM interets");
+        Flight::json($stmt->fetchAll(PDO::FETCH_ASSOC));
+    } catch (Exception $e) {
+        Flight::error($e);
+    }
 });
 
-Flight::route('PUT /ws/repayments/@id', function($id) {
-    $data = Flight::request()->data;
-    $db = getDB();
-    $stmt = $db->prepare("UPDATE Pret_Retour SET id_client_pret = ?, montant = ?, date = ? WHERE id = ?");
-    $stmt->execute([$data->id_client_pret, $data->montant, $data->date, $id]);
-    Flight::json(['message' => 'Repayment updated']);
+Flight::route('GET /api/interets/@id', function($id) {
+    try {
+        $db = getDB();
+        $stmt = $db->prepare("SELECT * FROM interets WHERE id = ?");
+        $stmt->execute([$id]);
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+        if ($result) {
+            Flight::json($result);
+        } else {
+            Flight::json(['error' => 'Intérêt non trouvé'], 404);
+        }
+    } catch (Exception $e) {
+        Flight::error($e);
+    }
 });
 
-Flight::route('DELETE /ws/repayments/@id', function($id) {
-    $db = getDB();
-    $stmt = $db->prepare("DELETE FROM Pret_Retour WHERE id = ?");
-    $stmt->execute([$id]);
-    Flight::json(['message' => 'Repayment deleted']);
+Flight::route('POST /api/interets', function() {
+    try {
+        $data = Flight::request()->data;
+        if (!isset($data->mois) || !isset($data->interets) || !isset($data->capital_cumule)) {
+            Flight::json(['error' => 'Données incomplètes'], 400);
+            return;
+        }
+        $db = getDB();
+        $stmt = $db->prepare("INSERT INTO interets (mois, interets, capital_cumule) VALUES (?, ?, ?)");
+        $stmt->execute([$data->mois, $data->interets, $data->capital_cumule]);
+        Flight::json(['message' => 'Intérêt créé', 'id' => $db->lastInsertId()], 201);
+    } catch (Exception $e) {
+        Flight::error($e);
+    }
+});
+
+Flight::route('PUT /api/interets/@id', function($id) {
+    try {
+        $data = Flight::request()->data;
+        if (!isset($data->mois) || !isset($data->interets) || !isset($data->capital_cumule)) {
+            Flight::json(['error' => 'Données incomplètes'], 400);
+            return;
+        }
+        $db = getDB();
+        $stmt = $db->prepare("UPDATE interets SET mois = ?, interets = ?, capital_cumule = ? WHERE id = ?");
+        $stmt->execute([$data->mois, $data->interets, $data->capital_cumule, $id]);
+        if ($stmt->rowCount() > 0) {
+            Flight::json(['message' => 'Intérêt mis à jour']);
+        } else {
+            Flight::json(['error' => 'Intérêt non trouvé'], 404);
+        }
+    } catch (Exception $e) {
+        Flight::error($e);
+    }
+});
+
+Flight::route('DELETE /api/interets/@id', function($id) {
+    try {
+        $db = getDB();
+        $stmt = $db->prepare("DELETE FROM interets WHERE id = ?");
+        $stmt->execute([$id]);
+        if ($stmt->rowCount() > 0) {
+            Flight::json(['message' => 'Intérêt supprimé']);
+        } else {
+            Flight::json(['error' => 'Intérêt non trouvé'], 404);
+        }
+    } catch (Exception $e) {
+        Flight::error($e);
+    }
+});
+
+/****************************
+ * API Routes pour Utilisateurs
+ ****************************/
+
+ Flight::route('GET /api/users', function() {
+    try {
+        $db = getDB();
+        $stmt = $db->query("SELECT id, nom, prenom, contact, email FROM users");
+        Flight::json($stmt->fetchAll(PDO::FETCH_ASSOC));
+    } catch (Exception $e) {
+        Flight::error($e);
+    }
+});
+
+Flight::route('GET /api/users/@id', function($id) {
+    try {
+        $db = getDB();
+        $stmt = $db->prepare("SELECT id, nom, prenom, contact, email FROM users WHERE id = ?");
+        $stmt->execute([$id]);
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+        if ($result) {
+            Flight::json($result);
+        } else {
+            Flight::json(['error' => 'Utilisateur non trouvé'], 404);
+        }
+    } catch (Exception $e) {
+        Flight::error($e);
+    }
+});
+
+Flight::route('POST /api/users', function() {
+    try {
+        $data = Flight::request()->data;
+        if (!isset($data->nom) || !isset($data->prenom) || !isset($data->contact) || !isset($data->email) || !isset($data->mot_de_passe)) {
+            Flight::json(['error' => 'Données incomplètes'], 400);
+            return;
+        }
+        $db = getDB();
+        $hashedPassword = password_hash($data->mot_de_passe, PASSWORD_DEFAULT);
+        $stmt = $db->prepare("INSERT INTO users (nom, prenom, contact, email, mot_de_passe) VALUES (?, ?, ?, ?, ?)");
+        $stmt->execute([$data->nom, $data->prenom, $data->contact, $data->email, $hashedPassword]);
+        Flight::json(['message' => 'Utilisateur créé', 'id' => $db->lastInsertId()], 201);
+    } catch (Exception $e) {
+        Flight::error($e);
+    }
+});
+
+Flight::route('PUT /api/users/@id', function($id) {
+    try {
+        $data = Flight::request()->data;
+        if (!isset($data->nom) || !isset($data->prenom) || !isset($data->contact) || !isset($data->email) || !isset($data->mot_de_passe)) {
+            Flight::json(['error' => 'Données incomplètes'], 400);
+            return;
+        }
+        $db = getDB();
+        $hashedPassword = password_hash($data->mot_de_passe, PASSWORD_DEFAULT);
+        $stmt = $db->prepare("UPDATE users SET nom = ?, prenom = ?, contact = ?, email = ?, mot_de_passe = ? WHERE id = ?");
+        $stmt->execute([$data->nom, $data->prenom, $data->contact, $data->email, $hashedPassword, $id]);
+        if ($stmt->rowCount() > 0) {
+            Flight::json(['message' => 'Utilisateur mis à jour']);
+        } else {
+            Flight::json(['error' => 'Utilisateur non trouvé'], 404);
+        }
+    } catch (Exception $e) {
+        Flight::error($e);
+    }
+});
+
+Flight::route('DELETE /api/users/@id', function($id) {
+    try {
+        $db = getDB();
+        $stmt = $db->prepare("DELETE FROM users WHERE id = ?");
+        $stmt->execute([$id]);
+        if ($stmt->rowCount() > 0) {
+            Flight::json(['message' => 'Utilisateur supprimé']);
+        } else {
+            Flight::json(['error' => 'Utilisateur non trouvé'], 404);
+        }
+    } catch (Exception $e) {
+        Flight::error($e);
+    }
+});
+
+/****************************
+ * API Routes pour Prêts
+ ****************************/
+
+Flight::route('GET /api/prets', function() {
+    try {
+        $db = getDB();
+        $stmt = $db->query("SELECT * FROM prets");
+        Flight::json($stmt->fetchAll(PDO::FETCH_ASSOC));
+    } catch (Exception $e) {
+        Flight::error($e);
+    }
+});
+
+Flight::route('GET /api/prets/@id', function($id) {
+    try {
+        $db = getDB();
+        $stmt = $db->prepare("SELECT * FROM prets WHERE id = ?");
+        $stmt->execute([$id]);
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+        if ($result) {
+            Flight::json($result);
+        } else {
+            Flight::json(['error' => 'Prêt non trouvé'], 404);
+        }
+    } catch (Exception $e) {
+        Flight::error($e);
+    }
+});
+
+Flight::route('POST /api/prets', function() {
+    try {
+        $data = Flight::request()->data;
+        if (!isset($data->id_client) || !isset($data->id_etablissement) || !isset($data->id_type_pret) || !isset($data->montant) || !isset($data->date)) {
+            Flight::json(['error' => 'Données incomplètes'], 400);
+            return;
+        }
+        $db = getDB();
+        $stmt = $db->prepare("INSERT INTO prets (id_client, id_etablissement, id_type_pret, montant, date) VALUES (?, ?, ?, ?, ?)");
+        $stmt->execute([$data->id_client, $data->id_etablissement, $data->id_type_pret, $data->montant, $data->date]);
+        Flight::json(['message' => 'Prêt créé', 'id' => $db->lastInsertId()], 201);
+    } catch (Exception $e) {
+        Flight::error($e);
+    }
+});
+
+Flight::route('PUT /api/prets/@id', function($id) {
+    try {
+        $data = Flight::request()->data;
+        if (!isset($data->id_client) || !isset($data->id_etablissement) || !isset($data->id_type_pret) || !isset($data->montant) || !isset($data->date)) {
+            Flight::json(['error' => 'Données incomplètes'], 400);
+            return;
+        }
+        $db = getDB();
+        $stmt = $db->prepare("UPDATE prets SET id_client = ?, id_etablissement = ?, id_type_pret = ?, montant = ?, date = ? WHERE id = ?");
+        $stmt->execute([$data->id_client, $data->id_etablissement, $data->id_type_pret, $data->montant, $data->date, $id]);
+        if ($stmt->rowCount() > 0) {
+            Flight::json(['message' => 'Prêt mis à jour']);
+        } else {
+            Flight::json(['error' => 'Prêt non trouvé'], 404);
+        }
+    } catch (Exception $e) {
+        Flight::error($e);
+    }
+});
+
+Flight::route('DELETE /api/prets/@id', function($id) {
+    try {
+        $db = getDB();
+        $stmt = $db->prepare("DELETE FROM prets WHERE id = ?");
+        $stmt->execute([$id]);
+        if ($stmt->rowCount() > 0) {
+            Flight::json(['message' => 'Prêt supprimé']);
+        } else {
+            Flight::json(['error' => 'Prêt non trouvé'], 404);
+        }
+    } catch (Exception $e) {
+        Flight::error($e);
+    }
 });
 
 Flight::start();

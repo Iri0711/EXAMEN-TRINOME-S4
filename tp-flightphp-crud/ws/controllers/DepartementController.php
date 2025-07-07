@@ -1,32 +1,70 @@
 <?php
 require_once __DIR__ . '/../models/Departement.php';
-require_once __DIR__ . '/../helpers/Utils.php';
 
 class DepartementController {
-    public static function getAll() {
-        $departements = Departement::getAll();
-        Flight::json($departements);
+    public function getAll() {
+        try {
+            $departements = Departement::getAll();
+            Flight::json($departements);
+        } catch (Exception $e) {
+            error_log('Erreur lors de la récupération des départements : ' . $e->getMessage());
+            Flight::halt(500, json_encode(['erreur' => 'Erreur serveur lors de la récupération des départements']));
+        }
     }
 
-    public static function getById($id) {
-        $departement = Departement::getById($id);
-        Flight::json($departement);
+    public function getById($id) {
+        try {
+            $departement = Departement::getById($id);
+            if (!$departement) {
+                Flight::halt(404, json_encode(['erreur' => 'Département non trouvé']));
+            }
+            Flight::json($departement);
+        } catch (Exception $e) {
+            error_log('Erreur lors de la récupération du département : ' . $e->getMessage());
+            Flight::halt(500, json_encode(['erreur' => 'Erreur serveur lors de la récupération du département']));
+        }
     }
 
-    public static function create() {
-        $data = Flight::request()->data;
-        $id = Departement::create($data);
-        Flight::json(['message' => 'Département ajouté', 'id' => $id]);
+    public function create() {
+        try {
+            $data = Flight::request()->data;
+            if (!isset($data->designation) || !isset($data->autorise)) {
+                Flight::halt(400, json_encode(['erreur' => 'Champs requis manquants']));
+            }
+            $id = Departement::create($data);
+            Flight::json(['id' => $id, 'message' => 'Département créé avec succès'], 201);
+        } catch (Exception $e) {
+            error_log('Erreur lors de la création du département : ' . $e->getMessage());
+            Flight::halt(500, json_encode(['erreur' => 'Erreur serveur lors de la création du département']));
+        }
     }
 
-    public static function update($id) {
-        $data = Flight::request()->data;
-        Departement::update($id, $data);
-        Flight::json(['message' => 'Département modifié']);
+    public function update($id) {
+        try {
+            $data = Flight::request()->data;
+            if (!isset($data->designation) || !isset($data->autorise)) {
+                Flight::halt(400, json_encode(['erreur' => 'Champs requis manquants']));
+            }
+            Departement::update($id, $data);
+            Flight::json(['message' => 'Département mis à jour avec succès']);
+        } catch (Exception $e) {
+            error_log('Erreur lors de la mise à jour du département : ' . $e->getMessage());
+            Flight::halt(500, json_encode(['erreur' => 'Erreur serveur lors de la mise à jour du département']));
+        }
     }
 
-    public static function delete($id) {
-        Departement::delete($id);
-        Flight::json(['message' => 'Département supprimé']);
+    public function delete($id) {
+        try {
+            $departement = Departement::getById($id);
+            if (!$departement) {
+                Flight::halt(404, json_encode(['erreur' => 'Département non trouvé']));
+            }
+            Departement::delete($id);
+            Flight::json(['message' => 'Département supprimé avec succès']);
+        } catch (Exception $e) {
+            error_log('Erreur lors de la suppression du département : ' . $e->getMessage());
+            Flight::halt(500, json_encode(['erreur' => 'Erreur serveur lors de la suppression du département']));
+        }
     }
 }
+?>

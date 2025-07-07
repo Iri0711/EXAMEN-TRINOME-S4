@@ -2,25 +2,141 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gestion des Utilisateurs</title>
+    <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
-    <h1>Gestion des Utilisateurs</h1>
-    <a href="/">Retour à l'accueil</a>
-    <h2>Ajouter/Modifier un Utilisateur</h2>
-    <form>
-        <label>Nom :</label><input type="text" name="nom"><br>
-        <label>Prénom :</label><input type="text" name="prenom"><br>
-        <label>Contact :</label><input type="text" name="contact"><br>
-        <label>Email :</label><input type="email" name="email"><br>
-        <label>Mot de passe :</label><input type="password" name="mdp"><br>
-        <button type="submit">Enregistrer</button>
-    </form>
-    <h2>Liste des Utilisateurs</h2>
-    <table>
-        <tr>
-            <th>ID</th><th>Nom</th><th>Prénom</th><th>Contact</th><th>Email</th><th>Mot de passe</th><th>Actions</th>
-        </tr>
-    </table>
+<body class="bg-gray-100 font-sans">
+    <header class="bg-blue-600 text-white p-4">
+        <h1 class="text-2xl font-bold">Gestion des Utilisateurs</h1>
+        <a href="/" class="text-white underline">Retour à l'accueil</a>
+    </header>
+    <main class="container mx-auto p-6">
+        <section class="mb-8">
+            <h2 class="text-xl font-semibold mb-4">Ajouter/Modifier un Utilisateur</h2>
+            <div class="bg-white p-4 rounded-lg shadow">
+                <div class="mb-4">
+                    <label for="lastName" class="block text-sm font-medium text-gray-700">Nom :</label>
+                    <input type="text" id="lastName" class="mt-1 p-2 border rounded w-full" required>
+                </div>
+                <div class="mb-4">
+                    <label for="firstName" class="block text-sm font-medium text-gray-700">Prénom :</label>
+                    <input type="text" id="firstName" class="mt-1 p-2 border rounded w-full" required>
+                </div>
+                <div class="mb-4">
+                    <label for="contact" class="block text-sm font-medium text-gray-700">Contact :</label>
+                    <input type="text" id="contact" class="mt-1 p-2 border rounded w-full" required>
+                </div>
+                <div class="mb-4">
+                    <label for="email" class="block text-sm font-medium text-gray-700">Email :</label>
+                    <input type="email" id="email" class="mt-1 p-2 border rounded w-full" required>
+                </div>
+                <div class="mb-4">
+                    <label for="password" class="block text-sm font-medium text-gray-700">Mot de passe :</label>
+                    <input type="password" id="password" class="mt-1 p-2 border rounded w-full" required>
+                </div>
+                <button onclick="saveUser()" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Enregistrer</button>
+-powered
+
+        </section>
+        <section>
+            <h2 class="text-xl font-semibold mb-4">Liste des Utilisateurs</h2>
+            <table id="usersTable" class="min-w-full bg-white rounded-lg shadow">
+                <thead>
+                    <tr class="bg-gray-200">
+                        <th class="p-2 text-left">ID</th>
+                        <th class="p-2 text-left">Nom</th>
+                        <th class="p-2 text-left">Prénom</th>
+                        <th class="p-2 text-left">Contact</th>
+                        <th class="p-2 text-left">Email</th>
+                        <th class="p-2 text-left">Mot de passe</th>
+                        <th class="p-2 text-left">Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="usersTableBody"></tbody>
+            </table>
+        </section>
+    </main>
+    <script>
+        let users = [
+            { id: 1, lastName: "Dupont", firstName: "Jean", contact: "0123456789", email: "jean.dupont@example.com", password: "password123" },
+            { id: 2, lastName: "Martin", firstName: "Marie", contact: "0987654321", email: "marie.martin@example.com", password: "password456" }
+        ];
+
+        function loadUsers() {
+            const tableBody = document.getElementById('usersTableBody');
+            tableBody.innerHTML = '';
+            users.forEach(user => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td class="p-2">${user.id}</td>
+                    <td class="p-2">${user.lastName}</td>
+                    <td class="p-2">${user.firstName}</td>
+                    <td class="p-2">${user.contact}</td>
+                    <td class="p-2">${user.email}</td>
+                    <td class="p-2">********</td>
+                    <td class="p-2">
+                        <button onclick="editUser(${user.id})" class="bg-yellow-500 text-white px-2 py-1 rounded">Modifier</button>
+                        <button onclick="deleteUser(${user.id})" class="bg-red-500 text-white px-2 py-1 rounded">Supprimer</button>
+                    </td>
+                `;
+                tableBody.appendChild(row);
+            });
+        }
+
+        function saveUser() {
+            const lastName = document.getElementById('lastName').value;
+            const firstName = document.getElementById('firstName').value;
+            const contact = document.getElementById('contact').value;
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            if (!lastName || !firstName || !contact || !email || !password) {
+                alert('Veuillez remplir tous les champs.');
+                return;
+            }
+            const existingUser = users.find(user => user.email === email);
+            if (existingUser) {
+                existingUser.lastName = lastName;
+                existingUser.firstName = firstName;
+                existingUser.contact = contact;
+                existingUser.email = email;
+                existingUser.password = password;
+            } else {
+                const newUser = {
+                    id: users.length ? Math.max(...users.map(u => u.id)) + 1 : 1,
+                    lastName,
+                    firstName,
+                    contact,
+                    email,
+                    password
+                };
+                users.push(newUser);
+            }
+            document.getElementById('lastName').value = '';
+            document.getElementById('firstName').value = '';
+            document.getElementById('contact').value = '';
+            document.getElementById('email').value = '';
+            document.getElementById('password').value = '';
+            loadUsers();
+        }
+
+        function editUser(id) {
+            const user = users.find(u => u.id === id);
+            if (user) {
+                document.getElementById('lastName').value = user.lastName;
+                document.getElementById('firstName').value = user.firstName;
+                document.getElementById('contact').value = user.contact;
+                document.getElementById('email').value = user.email;
+                document.getElementById('password').value = user.password;
+            }
+        }
+
+        function deleteUser(id) {
+            users = users.filter(u => u.id !== id);
+            loadUsers();
+        }
+
+        window.onload = loadUsers;
+    </script>
 </body>
 </html>

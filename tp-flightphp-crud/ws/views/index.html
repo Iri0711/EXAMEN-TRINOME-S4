@@ -2,17 +2,95 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>Gestion des Ressources</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bienvenue sur la plateforme de gestion</title>
+    <!-- Version stable de Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com?plugins=forms,typography,aspect-ratio"></script>
+    <!-- Fallback si Tailwind ne se charge pas -->
+    <noscript>
+        <style>
+            body { font-family: Arial, sans-serif; margin: 0; padding: 0; }
+            header { background: #2563eb; color: white; padding: 1rem; }
+            main { max-width: 1200px; margin: 0 auto; padding: 1.5rem; }
+            .grid { display: grid; gap: 1rem; }
+            .card { background: white; padding: 1rem; border-radius: 0.5rem; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+            @media (min-width: 768px) {
+                .grid { grid-template-columns: repeat(2, 1fr); }
+            }
+            @media (min-width: 1024px) {
+                .grid { grid-template-columns: repeat(3, 1fr); }
+            }
+        </style>
+    </noscript>
 </head>
-<body>
-    <h1>Bienvenue sur la plateforme de gestion. Choisissez une section ci-dessous :</h1>
-    <ul>
-        <li><a href="/departements">Gérer les Départements</a></li>
-        <li><a href="/etablissements">Gérer les Établissements</a></li>
-        <li><a href="/prets">Gérer les Prêts</a></li>
-        <li><a href="/users">Gérer les Utilisateurs</a></li>
-        <li><a href="/clients">Gérer les Clients</a></li>
-        <li><a href="/employees">Gérer les Employés</a></li>
-    </ul>
+<body class="bg-gray-100 font-sans min-h-screen flex flex-col">
+    <header class="bg-blue-600 text-white p-4 shadow-md">
+        <div class="container mx-auto">
+            <h1 class="text-2xl font-bold">Plateforme de Gestion</h1>
+        </div>
+    </header>
+    
+    <main class="container mx-auto p-6 flex-grow">
+        <div class="max-w-3xl mx-auto">
+            <h2 class="text-xl font-semibold mb-4 text-gray-800">Bienvenue sur la plateforme de gestion</h2>
+            <p class="mb-6 text-gray-600">Choisissez une section ci-dessous :</p>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <a href="/departements" class="bg-white p-6 rounded-lg shadow-md hover:bg-blue-50 transition-colors duration-200 flex items-center justify-center text-center font-medium text-blue-700 hover:text-blue-800">
+                    Gérer les Départements
+                </a>
+                <a href="/etablissements" class="bg-white p-6 rounded-lg shadow-md hover:bg-blue-50 transition-colors duration-200 flex items-center justify-center text-center font-medium text-blue-700 hover:text-blue-800">
+                    Gérer les Établissements
+                </a>
+                <a href="/prets" class="bg-white p-6 rounded-lg shadow-md hover:bg-blue-50 transition-colors duration-200 flex items-center justify-center text-center font-medium text-blue-700 hover:text-blue-800">
+                    Gérer les Prêts
+                </a>
+                <a href="/users" class="bg-white p-6 rounded-lg shadow-md hover:bg-blue-50 transition-colors duration-200 flex items-center justify-center text-center font-medium text-blue-700 hover:text-blue-800">
+                    Gérer les Utilisateurs
+                </a>
+                <a href="/clients" class="bg-white p-6 rounded-lg shadow-md hover:bg-blue-50 transition-colors duration-200 flex items-center justify-center text-center font-medium text-blue-700 hover:text-blue-800">
+                    Gérer les Clients
+                </a>
+                <a href="/employees" class="bg-white p-6 rounded-lg shadow-md hover:bg-blue-50 transition-colors duration-200 flex items-center justify-center text-center font-medium text-blue-700 hover:text-blue-800">
+                    Gérer les Employés
+                </a>
+                <a href="/interets" class="bg-white p-6 rounded-lg shadow-md hover:bg-blue-50 transition-colors duration-200 flex items-center justify-center text-center font-medium text-blue-700 hover:text-blue-800">
+                    Gérer les Intérêts
+                </a>
+            </div>
+        </div>
+    </main>
+
+    <footer class="bg-gray-800 text-white p-4 text-center text-sm">
+        <div class="container mx-auto">
+            <p>© 2023 Plateforme de Gestion. Tous droits réservés.</p>
+        </div>
+    </footer>
+
+    <!-- Script de vérification de routage -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const links = document.querySelectorAll('a[href^="/"]');
+            
+            links.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    const href = this.getAttribute('href');
+                    
+                    // Vérification si la route existe (simplifiée)
+                    fetch(href, { method: 'HEAD' })
+                        .then(response => {
+                            if (!response.ok) {
+                                e.preventDefault();
+                                alert('La page demandée n\'existe pas ou une erreur est survenue.');
+                            }
+                        })
+                        .catch(() => {
+                            e.preventDefault();
+                            alert('Impossible de vérifier cette route. Vérifiez votre connexion.');
+                        });
+                });
+            });
+        });
+    </script>
 </body>
 </html>

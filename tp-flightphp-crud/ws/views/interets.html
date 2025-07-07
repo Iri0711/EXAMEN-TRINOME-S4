@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestion des Intérêts</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 font-sans">
+    <header class="bg-blue-600 text-white p-4">
+        <h1 class="text-2xl font-bold">Gestion des Intérêts</h1>
+        <a href="/" class="text-white underline">Retour à l'accueil</a>
+    </header>
+    <main class="container mx-auto p-6">
+        <section class="mb-8">
+            <h2 class="text-xl font-semibold mb-4">Calculer les Intérêts</h2>
+            <div class="bg-white p-4 rounded-lg shadow">
+                <div class="mb-4">
+                    <label for="capital" class="block text-sm font-medium text-gray-700">Capital Initial (€) :</label>
+                    <input type="number" id="capital" class="mt-1 p-2 border rounded w-full" required>
+                </div>
+                <div class="mb-4">
+                    <label for="rate" class="block text-sm font-medium text-gray-700">Taux d'Intérêt Annuel (%) :</label>
+                    <input type="number" id="rate" step="0.01" class="mt-1 p-2 border rounded w-full" required>
+                </div>
+                <div class="mb-4">
+                    <label for="startDate" class="block text-sm font-medium text-gray-700">Date Début :</label>
+                    <input type="date" id="startDate" class="mt-1 p-2 border rounded w-full" required>
+                </div>
+                <div class="mb-4">
+                    <label for="endDate" class="block text-sm font-medium text-gray-700">Date Fin :</label>
+                    <input type="date" id="endDate" class="mt-1 p-2 border rounded w-full" required>
+                </div>
+                <button onclick="calculateInterest()" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Enregistrer</button>
+            </div>
+        </section>
+        <section>
+            <h2 class="text-xl font-semibold mb-4">Liste des Intérêts</h2>
+            <table id="interestsTable" class="min-w-full bg-white rounded-lg shadow">
+                <thead>
+                    <tr class="bg-gray-200">
+                        <th class="p-2 text-left">Mois</th>
+                        <th class="p-2 text-left">Intérêts (€)</th>
+                        <th class="p-2 text-left">Capital Cumulé (€)</th>
+                        <th class="p-2 text-left">Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="interestsTableBody"></tbody>
+            </table>
+        </section>
+    </main>
+    <script>
+        let interests = [
+            { id: 1, month: "Janvier 2025", interest: 100, accumulatedCapital: 5100 },
+            { id: 2, month: "Février 2025", interest: 102, accumulatedCapital: 5202 }
+        ];
+
+        function loadInterests() {
+            const tableBody = document.getElementById('interestsTableBody');
+            tableBody.innerHTML = '';
+            interests.forEach(int => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td class="p-2">${int.month}</td>
+                    <td class="p-2">${int.interest}</td>
+                    <td class="p-2">${int.accumulatedCapital}</td>
+                    <td class="p-2">
+                        <button onclick="deleteInterest(${int.id})" class="bg-red-500 text-white px-2 py-1 rounded">Supprimer</button>
+                    </td>
+                `;
+                tableBody.appendChild(row);
+            });
+        }
+
+        function calculateInterest() {
+            const capital = parseFloat(document.getElementById('capital').value);
+            const rate = parseFloat(document.getElementById('rate').value);
+            const startDate = new Date(document.getElementById('startDate').value);
+            const endDate = new Date(document.getElementById('endDate').value);
+            if (!capital || !rate || !startDate || !endDate) {
+                alert('Veuillez remplir tous les champs.');
+                return;
+            }
+            const months = (endDate.getFullYear() - startDate.getFullYear()) * 12 + endDate.getMonth() - startDate.getMonth();
+            const monthlyRate = rate / 100 / 12;
+            let accumulatedCapital = capital;
+            for (let i = 0; i < months; i++) {
+                const interest = accumulatedCapital * monthlyRate;
+                accumulatedCapital += interest;
+                const month = new Date(startDate.getFullYear(), startDate.getMonth() + i).toLocaleString('fr-FR', { month: 'long', year: 'numeric' });
+                interests.push({
+                    id: interests.length ? Math.max(...interests.map(i => i.id)) + 1 : 1,
+                    month,
+                    interest: interest.toFixed(2),
+                    accumulatedCapital: accumulatedCapital.toFixed(2)
+                });
+            }
+            document.getElementById('capital').value = '';
+            document.getElementById('rate').value = '';
+            document.getElementById('startDate').value = '';
+            document.getElementById('endDate').value = '';
+            loadInterests();
+        }
+
+        function deleteInterest(id) {
+            interests = interests.filter(i => i.id !== id);
+            loadInterests();
+        }
+
+        window.onload = loadInterests;
+    </script>
+</body>
+</html>

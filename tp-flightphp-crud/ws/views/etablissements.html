@@ -2,24 +2,129 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gestion des Établissements</title>
+    <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
-    <h1>Gestion des Établissements</h1>
-    <a href="/">Retour à l'accueil</a>
-    <h2>Ajouter/Modifier un Établissement</h2>
-    <form>
-        <label>Nom :</label><input type="text" name="nom"><br>
-        <label>Adresse :</label><input type="text" name="adresse"><br>
-        <label>Ville :</label><input type="text" name="ville"><br>
-        <label>Code Postal :</label><input type="text" name="code_postal"><br>
-        <button type="submit">Enregistrer</button>
-    </form>
-    <h2>Liste des Établissements</h2>
-    <table>
-        <tr>
-            <th>ID</th><th>Nom</th><th>Adresse</th><th>Ville</th><th>Code Postal</th><th>Actions</th>
-        </tr>
-    </table>
+<body class="bg-gray-100 font-sans">
+    <header class="bg-blue-600 text-white p-4">
+        <h1 class="text-2xl font-bold">Gestion des Établissements</h1>
+        <a href="/" class="text-white underline">Retour à l'accueil</a>
+    </header>
+    <main class="container mx-auto p-6">
+        <section class="mb-8">
+            <h2 class="text-xl font-semibold mb-4">Ajouter/Modifier un Établissement</h2>
+            <div class="bg-white p-4 rounded-lg shadow">
+                <div class="mb-4">
+                    <label for="name" class="block text-sm font-medium text-gray-700">Nom :</label>
+                    <input type="text" id="name" class="mt-1 p-2 border rounded w-full" required>
+                </div>
+                <div class="mb-4">
+                    <label for="address" class="block text-sm font-medium text-gray-700">Adresse :</label>
+                    <input type="text" id="address" class="mt-1 p-2 border rounded w-full" required>
+                </div>
+                <div class="mb-4">
+                    <label for="city" class="block text-sm font-medium text-gray-700">Ville :</label>
+                    <input type="text" id="city" class="mt-1 p-2 border rounded w-full" required>
+                </div>
+                <div class="mb-4">
+                    <label for="postalCode" class="block text-sm font-medium text-gray-700">Code Postal :</label>
+                    <input type="text" id="postalCode" class="mt-1 p-2 border rounded w-full" required>
+                </div>
+                <button onclick="saveEstablishment()" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Enregistrer</button>
+            </div>
+        </section>
+        <section>
+            <h2 class="text-xl font-semibold mb-4">Liste des Établissements</h2>
+            <table id="establishmentsTable" class="min-w-full bg-white rounded-lg shadow">
+                <thead>
+                    <tr class="bg-gray-200">
+                        <th class="p-2 text-left">ID</th>
+                        <th class="p-2 text-left">Nom</th>
+                        <th class="p-2 text-left">Adresse</th>
+                        <th class="p-2 text-left">Ville</th>
+                        <th class="p-2 text-left">Code Postal</th>
+                        <th class="p-2 text-left">Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="establishmentsTableBody"></tbody>
+            </table>
+        </section>
+    </main>
+    <script>
+        let establishments = [
+            { id: 1, name: "Agence Centrale", address: "123 Rue Principale", city: "Paris", postalCode: "75001" },
+            { id: 2, name: "Agence Nord", address: "456 Avenue du Nord", city: "Lille", postalCode: "59000" }
+        ];
+
+        function loadEstablishments() {
+            const tableBody = document.getElementById('establishmentsTableBody');
+            tableBody.innerHTML = '';
+            establishments.forEach(est => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td class="p-2">${est.id}</td>
+                    <td class="p-2">${est.name}</td>
+                    <td class="p-2">${est.address}</td>
+                    <td class="p-2">${est.city}</td>
+                    <td class="p-2">${est.postalCode}</td>
+                    <td class="p-2">
+                        <button onclick="editEstablishment(${est.id})" class="bg-yellow-500 text-white px-2 py-1 rounded">Modifier</button>
+                        <button onclick="deleteEstablishment(${est.id})" class="bg-red-500 text-white px-2 py-1 rounded">Supprimer</button>
+                    </td>
+                `;
+                tableBody.appendChild(row);
+            });
+        }
+
+        function saveEstablishment() {
+            const name = document.getElementById('name').value;
+            const address = document.getElementById('address').value;
+            const city = document.getElementById('city').value;
+            const postalCode = document.getElementById('postalCode').value;
+            if (!name || !address || !city || !postalCode) {
+                alert('Veuillez remplir tous les champs.');
+                return;
+            }
+            const existingEstablishment = establishments.find(est => est.name === name);
+            if (existingEstablishment) {
+                existingEstablishment.name = name;
+                existingEstablishment.address = address;
+                existingEstablishment.city = city;
+                existingEstablishment.postalCode = postalCode;
+            } else {
+                const newEstablishment = {
+                    id: establishments.length ? Math.max(...establishments.map(e => e.id)) + 1 : 1,
+                    name,
+                    address,
+                    city,
+                    postalCode
+                };
+                establishments.push(newEstablishment);
+            }
+            document.getElementById('name').value = '';
+            document.getElementById('address').value = '';
+            document.getElementById('city').value = '';
+            document.getElementById('postalCode').value = '';
+            loadEstablishments();
+        }
+
+        function editEstablishment(id) {
+            const establishment = establishments.find(e => e.id === id);
+            if (establishment) {
+                document.getElementById('name').value = establishment.name;
+                document.getElementById('address').value = establishment.address;
+                document.getElementById('city').value = establishment.city;
+                document.getElementById('postalCode').value = establishment.postalCode;
+            }
+        }
+
+        function deleteEstablishment(id) {
+            establishments = establishments.filter(e => e.id !== id);
+            loadEstablishments();
+        }
+
+        window.onload = loadEstablishments;
+    </script>
 </body>
 </html>
