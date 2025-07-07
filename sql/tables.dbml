@@ -1,0 +1,76 @@
+Table User{
+    id integer
+    nom text
+    prenom text
+    contact text
+    email text
+    mdp text
+}
+Table Departement{
+    id integer
+    designation text
+    autorise boolean
+}
+
+Table Employe{
+    id integer
+    id_user integer
+    id_dept integer
+}
+
+Table Client{
+    id integer
+    id_user integer
+}
+
+Table Etablissement{
+    id integer
+    designation text
+    adresse text
+}
+
+Table Etablissement_Fond{
+    id integer 
+    id_etab integer
+    montant decimal
+    date date
+    libelle text
+}
+
+Table Fond_Validation{
+    id integer
+    id_etab_fond integer
+    statut boolean
+    date date
+}
+
+Table Pret_Retour{
+    id integer
+    id_client_pret integer
+    montant decimal
+    date date
+}
+
+Table Pret_Type{
+    id integer
+    libelle integer
+    taux decimal
+    duree integer
+}
+Table Pret_Client{
+    id integer
+    id_client integer
+    id_etab integer
+    id_pret_type integer
+    montant decimal
+    date date
+}
+Ref: Employe.id_user > User.id
+Ref: Employe.id_dept > Departement.id
+Ref: Client.id_user > User.id
+Ref: Etablissement_Fond.id_etab > Etablissement.id
+Ref: Fond_Validation.id_etab_fond > Etablissement_Fond.id
+Ref: Pret_Client.id_client > Client.id
+Ref: Pret_Client.id_etab > Etablissement.id
+Ref: Pret_Client.id_pret_type > Pret_Type.id
+Ref:Pret_Retour.id_client_pret > Pret_Client.id
