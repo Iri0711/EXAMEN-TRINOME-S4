@@ -3,18 +3,75 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Page d'Accueil - Gestion</title>
-    <link rel="stylesheet" href="styles.css">
+    <title>Admin - Gestion des Prêts Bancaires</title>
+   
+     <link rel="stylesheet" href="assets/css/general.css">
+     <link rel="stylesheet" href="assets/css/index.css">
+     <link rel="stylesheet" href="assets/css/formes.css">
+     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
 </head>
 <body>
-    <div class="container">
-        <h1>Gestion des Ressources</h1>
-        <p>Bienvenue sur la plateforme de gestion. Choisissez une section ci-dessous :</p>
-        <ul>
-            <li><a href="departements.html">Gérer les Départements</a></li>
-            <li><a href="etablissements.html">Gérer les Établissements</a></li>
-            <li><a href="prets.html">Gérer les Prêts</a></li>
-        </ul>
+    <div class="main-container">
+        <div class="menu">
+            <div class="logo"><img src="assets/images/Flux_Dev_A_modern_highcontrast_transparent_background_logo_des_2-removebg-preview.png" alt="Logo Banque"></div>
+            <nav>
+                <ul>
+                    <li>
+                        <button class="dropdown-btn" >Dashboard</button>
+                        <ul class="dropdown-content">
+                            <li><a href="index.html">Interets</a></li>
+                        </ul>
+                    </li>
+                    <li>
+                        <button class="dropdown-btn">Finance</button>
+                        <ul class="dropdown-content">
+                            <li><a href="demandes.html">Fonds</a></li>
+                            <li><a href="demandes.html">Prets</a></li>
+                            
+                        </ul>
+                    </li>
+                    <li>
+                        <button class="dropdown-btn">Crud</button>
+                        <ul class="dropdown-content">
+                            <li><a href="users.html">User</a></li>
+                            <li><a href="departements.html">Departement</a></li>
+                            <li><a href="etablissements.html">Etablissement</a></li>
+                            <li><a href="typeprets.html">Type de pret</a></li>
+                            <li><a href="clients.html">Client</a></li>
+                            <li><a href="employes.html">Employe</a></li>
+                        </ul>
+                    </li>
+                    
+                </ul>
+            </nav>
+        </div>
+        <div class="content">
+            <div class="full">
+                <div class="card">
+                    <div class="card-header">
+                        Interets par mois 
+                    </div>
+                    <div class="card-content">
+                        <div class="courbe">
+                            <canvas id="myChart"></canvas>
+                        </div>
+
+                    </div>
+                    <div class="card-footer">
+                        
+                    </div>
+                </div>
+            </div>
+        
+        </div>
     </div>
+    <script src="assets/js/admin_index.js"></script>
+    <script src="assets/js/formes.js"></script>
+    <script>
+        window.onload = function(){
+            createCourbe('myChart','Vente',10000,[2000, 4000, 6000, 3000, 7000,2000,4000,8000,7000], ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun','Jul','AUG','SET']);
+        }
+    </script>
 </body>
 </html>

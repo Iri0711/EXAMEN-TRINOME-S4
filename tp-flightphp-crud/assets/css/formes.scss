@@ -1,0 +1,82 @@
+
+@font-face {
+    font-family: 'open';
+    src: url('../fonts/Open_Sans/OpenSans-VariableFont_wdth\,wght.ttf');
+}
+div.card{
+    height: 500px;
+    width: 100%;
+    background-color: transparent;
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
+    box-shadow: 0px 0px 1px 0px #1F4E5F;
+    border-radius: 1rem;
+    font-family: 'open';
+    
+    .card-header{
+        background-color: transparent;
+        border-radius: 1rem 1rem 0 0;   
+        align-content: center;
+        padding: 1rem 2rem 1rem 2rem;
+        box-sizing: border-box;
+        font-size: 1.2rem;
+        font-family: 'poppins';
+        
+        
+    }
+    .card-content{
+        background-color: transparent;
+        width: 100%;
+        height: 100%;
+        padding: 0.5rem;
+        box-sizing: border-box;
+        overflow: hidden;
+    }
+    .card-footer{
+        background-color:transparent;
+        border-radius: 0 0 1rem 1rem;
+        padding: 1rem 2rem 1rem 2rem;
+        box-sizing: border-box;
+        text-align: end;
+    }
+}
+
+div.courbe{
+    width: 100%;
+    height:100%;
+    box-sizing: border-box;
+    background:linear-gradient(360deg,#F5F5F5,#6ddefd);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding-left: 2rem;
+    padding-right: 2rem;
+    padding-bottom: 1rem;
+    canvas{
+        width: 100%;
+        height: 100%;
+        box-sizing: border-box;
+        display: block;
+    }
+            
+}
+div.chart{
+    width: 100%;
+    height:100%;
+    box-sizing: border-box;
+    background-color: transparent;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding-left: 2rem;
+    padding-right: 2rem;
+    padding-bottom: 1rem;
+    canvas{
+        width: 100%;
+        height: 100%;
+        box-sizing: border-box;
+        display: block;
+    }
+            
+}

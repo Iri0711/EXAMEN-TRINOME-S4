@@ -63,8 +63,11 @@
                         <table>
                             <thead>
                                 <tr>
-                                    <th>Designation</th>
-
+                                    <th>Nom</th>
+                                    <th>Prenom</th>
+                                    <th>Contact</th>
+                                    <th>Email</th>
+                                    
                                     <th>
                                         Action
                                     </th>
@@ -74,6 +77,10 @@
                                 
                                 <tr>
                                     <td>ANDRIANKIRIJA</td>
+                                    <td>Aro Irintsoa</td>
+                                    <td>0320410696</td>
+                                    <td><center>18</center></td>
+                                    
                                     <td>
                                         <a href="#" class="validate">Valider</a>
                                         <a href="#" class="modify">Modifier</a>
@@ -104,22 +111,42 @@
                         <div class="formulaire-content">
                             <!-- Partie 1: Identité -->
                             <fieldset class="form-section" id="section-identite">
-                                <legend>Informations du departement</legend>
+                                <legend>Informations personnelles</legend>
                                 <div class="element">
-                                    <input type="text" name="designation" id="designation" placeholder=" " required>
-                                    <label for="designation">Designation</label>
+                                    <input type="text" name="nom" id="nom" placeholder=" " required>
+                                    <label for="nom">Nom</label>
                                 </div>
                                 <div class="element">
-                                    <input type="number" name="autorise" id="autorise" placeholder=" " required>
-                                    <label for="prenom">Autorise</label>
+                                    <input type="text" name="prenom" id="prenom" placeholder=" " required>
+                                    <label for="prenom">Prénom</label>
+                                </div>
+                                <div class="element">
+                                    <input type="text" name="contact" id="contact" placeholder=" ">
+                                    <label for="contact">Contact</label>
                                 </div>
                             </fieldset>
 
+                            <!-- Partie 2: Authentification -->
+                            <fieldset class="form-section" id="section-auth" style="display:none;">
+                                <legend>Informations d'authentification</legend>
+                                <div class="element">
+                                    <input type="email" name="email" id="email" placeholder=" ">
+                                    <label for="email">Email</label>
+                                </div>
+                                <div class="element">
+                                    <input type="password" name="mdp" id="mdp" placeholder=" " required>
+                                    <label for="mdp">Mot de passe</label>
+                                </div>
+                                <div class="element">
+                                    <input type="password" name="confirm_mdp" id="confirm_mdp" placeholder=" " required>
+                                    <label for="confirm_mdp">Confirmer le mot de passe</label>
+                                </div>
+                            </fieldset>
                         </div>
                         <div class="formulaire-footer">
                             <button type="button" class="btn-prev validate" onclick="prevSection()" style="display:none;">Précédent</button>
-                            <button type="button" class="btn-next validate" onclick="nextSection()" style="display:none;">Suivant</button>
-                            <button type="button" class="btn-submit validate" onclick="submitForm()">Valider</button>
+                            <button type="button" class="btn-next validate" onclick="nextSection()">Suivant</button>
+                            <button type="button" class="btn-submit validate" onclick="submitForm()" style="display:none;">Valider</button>
                         </div>
                     </div>
                 </div>
@@ -148,9 +175,11 @@
 
         function submitForm() {
             // Validation des champs
-            const nom = document.getElementById('designation').value;
-            const prenom = document.getElementById('autorise').value;
-            
+            const nom = document.getElementById('nom').value;
+            const prenom = document.getElementById('prenom').value;
+            const email = document.getElementById('email').value;
+            const mdp = document.getElementById('mdp').value;
+            const confirmMdp = document.getElementById('confirm_mdp').value;
             
             if (!nom || !prenom) {
                 alert('Veuillez remplir tous les champs obligatoires de la section Identité');
@@ -158,7 +187,15 @@
                 return;
             }
             
-         
+            if (!email || !mdp || !confirmMdp) {
+                alert('Veuillez remplir tous les champs obligatoires de la section Authentification');
+                return;
+            }
+            
+            if (mdp !== confirmMdp) {
+                alert('Les mots de passe ne correspondent pas');
+                return;
+            }
             
             // Ici vous pouvez ajouter le code pour soumettre le formulaire
             alert('Formulaire soumis avec succès!');
@@ -175,8 +212,8 @@
             document.getElementById('section-identite').style.display = 'flex';
             document.getElementById('section-auth').style.display = 'none';
             document.querySelector('.btn-prev').style.display = 'none';
-            document.querySelector('.btn-next').style.display = 'none';
-            document.querySelector('.btn-submit').style.display = 'inline-block';
+            document.querySelector('.btn-next').style.display = 'inline-block';
+            document.querySelector('.btn-submit').style.display = 'none';
         };
         
         function fermer(){
