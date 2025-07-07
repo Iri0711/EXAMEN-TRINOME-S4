@@ -3,140 +3,182 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestion des Utilisateurs</title>
+    <title>Gérer les Utilisateurs</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-gray-100 font-sans">
-    <header class="bg-blue-600 text-white p-4">
-        <h1 class="text-2xl font-bold">Gestion des Utilisateurs</h1>
-        <a href="/" class="text-white underline">Retour à l'accueil</a>
-    </header>
-    <main class="container mx-auto p-6">
-        <section class="mb-8">
-            <h2 class="text-xl font-semibold mb-4">Ajouter/Modifier un Utilisateur</h2>
-            <div class="bg-white p-4 rounded-lg shadow">
-                <div class="mb-4">
-                    <label for="lastName" class="block text-sm font-medium text-gray-700">Nom :</label>
-                    <input type="text" id="lastName" class="mt-1 p-2 border rounded w-full" required>
-                </div>
-                <div class="mb-4">
-                    <label for="firstName" class="block text-sm font-medium text-gray-700">Prénom :</label>
-                    <input type="text" id="firstName" class="mt-1 p-2 border rounded w-full" required>
-                </div>
-                <div class="mb-4">
-                    <label for="contact" class="block text-sm font-medium text-gray-700">Contact :</label>
-                    <input type="text" id="contact" class="mt-1 p-2 border rounded w-full" required>
-                </div>
-                <div class="mb-4">
-                    <label for="email" class="block text-sm font-medium text-gray-700">Email :</label>
-                    <input type="email" id="email" class="mt-1 p-2 border rounded w-full" required>
-                </div>
-                <div class="mb-4">
-                    <label for="password" class="block text-sm font-medium text-gray-700">Mot de passe :</label>
-                    <input type="password" id="password" class="mt-1 p-2 border rounded w-full" required>
-                </div>
-                <button onclick="saveUser()" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Enregistrer</button>
--powered
+<body class="flex h-screen bg-gray-100 font-sans">
+    <aside class="bg-gray-800 text-white w-64 space-y-6 py-7 px-2 absolute inset-y-0 left-0 transform -translate-x-full md:relative md:translate-x-0 transition duration-200 ease-in-out" id="sidebar">
+        <h2 class="text-2xl font-bold text-center">Menu</h2>
+        <nav>
+            <a href="/departements" class="block py-2.5 px-4 rounded hover:bg-gray-700">Départements</a>
+            <a href="/etablissements" class="block py-2.5 px-4 rounded hover:bg-gray-700">Établissements</a>
+            <a href="/prets" class="block py-2.5 px-4 rounded hover:bg-gray-700">Types de Prêts</a>
+            <a href="/utilisateurs" class="block py-2.5 px-4 rounded hover:bg-gray-700">Utilisateurs</a>
+            <a href="/clients" class="block py-2.5 px-4 rounded hover:bg-gray-700">Clients</a>
+            <a href="/employes" class="block py-2.5 px-4 rounded hover:bg-gray-700">Employés</a>
+            <a href="/interets" class="block py-2.5 px-4 rounded hover:bg-gray-700">Intérêts</a>
+        </nav>
+    </aside>
 
-        </section>
-        <section>
-            <h2 class="text-xl font-semibold mb-4">Liste des Utilisateurs</h2>
-            <table id="usersTable" class="min-w-full bg-white rounded-lg shadow">
-                <thead>
-                    <tr class="bg-gray-200">
-                        <th class="p-2 text-left">ID</th>
-                        <th class="p-2 text-left">Nom</th>
-                        <th class="p-2 text-left">Prénom</th>
-                        <th class="p-2 text-left">Contact</th>
-                        <th class="p-2 text-left">Email</th>
-                        <th class="p-2 text-left">Mot de passe</th>
-                        <th class="p-2 text-left">Actions</th>
-                    </tr>
-                </thead>
-                <tbody id="usersTableBody"></tbody>
-            </table>
-        </section>
-    </main>
+    <div class="flex-1 flex flex-col">
+        <header class="bg-white shadow p-4 flex justify-between items-center">
+            <h1 class="text-2xl font-semibold">Gérer les Utilisateurs</h1>
+            <div class="flex space-x-4">
+                <input type="text" placeholder="Search..." class="border rounded px-2 py-1">
+                <div class="flex items-center space-x-2">
+                    <img src="https://via.placeholder.com/30" alt="User" class="rounded-full">
+                    <span>User</span>
+                </div>
+                <button class="bg-green-500 text-white px-4 py-1 rounded">Share</button>
+                <button class="bg-gray-500 text-white px-4 py-1 rounded">Reset Data</button>
+            </div>
+        </header>
+
+        <main class="p-6 flex-1 overflow-auto">
+            <div class="bg-white p-6 rounded-lg shadow">
+                <h2 class="text-xl font-semibold mb-4">Ajouter/Modifier un Utilisateur</h2>
+                <form id="userForm" class="space-y-4">
+                    <div>
+                        <label class="block text-gray-700">Nom :</label>
+                        <input type="text" name="name" class="w-full border rounded px-3 py-2 mt-1">
+                    </div>
+                    <div>
+                        <label class="block text-gray-700">Prénom :</label>
+                        <input type="text" name="prenom" class="w-full border rounded px-3 py-2 mt-1">
+                    </div>
+                    <div>
+                        <label class="block text-gray-700">Contact :</label>
+                        <input type="text" name="contact" class="w-full border rounded px-3 py-2 mt-1">
+                    </div>
+                    <div>
+                        <label class="block text-gray-700">Email :</label>
+                        <input type="email" name="email" class="w-full border rounded px-3 py-2 mt-1">
+                    </div>
+                    <div>
+                        <label class="block text-gray-700">Mot de passe :</label>
+                        <input type="password" name="password" class="w-full border rounded px-3 py-2 mt-1">
+                    </div>
+                    <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded">Enregistrer</button>
+                </form>
+            </div>
+
+            <div class="mt-6 bg-white p-6 rounded-lg shadow">
+                <h2 class="text-xl font-semibold mb-4">Liste des Utilisateurs</h2>
+                <table class="w-full mt-2">
+                    <thead>
+                        <tr class="bg-gray-200">
+                            <th class="p-2 text-left">ID</th>
+                            <th class="p-2 text-left">Nom</th>
+                            <th class="p-2 text-left">Prénom</th>
+                            <th class="p-2 text-left">Contact</th>
+                            <th class="p-2 text-left">Email</th>
+                            <th class="p-2 text-left">Mot de passe</th>
+                            <th class="p-2 text-left">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="usersTable"></tbody>
+                </table>
+            </div>
+        </main>
+
+        <footer class="bg-gray-800 text-white text-center py-2">
+            <p>© 2023 Plateforme de Gestion. Tous droits réservés.</p>
+        </footer>
+    </div>
+
     <script>
-        let users = [
-            { id: 1, lastName: "Dupont", firstName: "Jean", contact: "0123456789", email: "jean.dupont@example.com", password: "password123" },
-            { id: 2, lastName: "Martin", firstName: "Marie", contact: "0987654321", email: "marie.martin@example.com", password: "password456" }
-        ];
-
-        function loadUsers() {
-            const tableBody = document.getElementById('usersTableBody');
-            tableBody.innerHTML = '';
-            users.forEach(user => {
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td class="p-2">${user.id}</td>
-                    <td class="p-2">${user.lastName}</td>
-                    <td class="p-2">${user.firstName}</td>
-                    <td class="p-2">${user.contact}</td>
-                    <td class="p-2">${user.email}</td>
-                    <td class="p-2">********</td>
-                    <td class="p-2">
-                        <button onclick="editUser(${user.id})" class="bg-yellow-500 text-white px-2 py-1 rounded">Modifier</button>
-                        <button onclick="deleteUser(${user.id})" class="bg-red-500 text-white px-2 py-1 rounded">Supprimer</button>
-                    </td>
-                `;
-                tableBody.appendChild(row);
+        document.addEventListener('DOMContentLoaded', () => {
+            const sidebar = document.getElementById('sidebar');
+            document.querySelector('body').addEventListener('click', (e) => {
+                if (!sidebar.contains(e.target) && window.innerWidth < 768) {
+                    sidebar.classList.add('-translate-x-full');
+                }
             });
-        }
+            document.querySelectorAll('nav a').forEach(link => {
+                link.addEventListener('click', (e) => {
+                    if (window.innerWidth < 768) {
+                        sidebar.classList.add('-translate-x-full');
+                    }
+                });
+            });
 
-        function saveUser() {
-            const lastName = document.getElementById('lastName').value;
-            const firstName = document.getElementById('firstName').value;
-            const contact = document.getElementById('contact').value;
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
-            if (!lastName || !firstName || !contact || !email || !password) {
-                alert('Veuillez remplir tous les champs.');
-                return;
+            const form = document.getElementById('userForm');
+            const table = document.getElementById('usersTable');
+
+            async function fetchUsers() {
+                try {
+                    const response = await fetch('/api/users');
+                    const users = await response.json();
+                    table.innerHTML = '';
+                    users.forEach(user => {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td class="p-2 border">${user.id || 'N/A'}</td>
+                            <td class="p-2 border">${user.name || 'N/A'}</td>
+                            <td class="p-2 border">${user.prenom || 'N/A'}</td>
+                            <td class="p-2 border">${user.contact || 'N/A'}</td>
+                            <td class="p-2 border">${user.email || 'N/A'}</td>
+                            <td class="p-2 border">${user.password || 'N/A'}</td>
+                            <td class="p-2 border">
+                                <button class="bg-yellow-500 text-white px-2 py-1 rounded mr-2 edit-btn" data-id="${user.id}">Edit</button>
+                                <button class="bg-red-500 text-white px-2 py-1 rounded delete-btn" data-id="${user.id}">Delete</button>
+                            </td>
+                        `;
+                        table.appendChild(row);
+                    });
+                } catch (error) {
+                    console.error('Error fetching users:', error);
+                    table.innerHTML = '<tr><td colspan="7">Erreur lors du chargement des données.</td></tr>';
+                }
             }
-            const existingUser = users.find(user => user.email === email);
-            if (existingUser) {
-                existingUser.lastName = lastName;
-                existingUser.firstName = firstName;
-                existingUser.contact = contact;
-                existingUser.email = email;
-                existingUser.password = password;
-            } else {
-                const newUser = {
-                    id: users.length ? Math.max(...users.map(u => u.id)) + 1 : 1,
-                    lastName,
-                    firstName,
-                    contact,
-                    email,
-                    password
-                };
-                users.push(newUser);
-            }
-            document.getElementById('lastName').value = '';
-            document.getElementById('firstName').value = '';
-            document.getElementById('contact').value = '';
-            document.getElementById('email').value = '';
-            document.getElementById('password').value = '';
-            loadUsers();
-        }
 
-        function editUser(id) {
-            const user = users.find(u => u.id === id);
-            if (user) {
-                document.getElementById('lastName').value = user.lastName;
-                document.getElementById('firstName').value = user.firstName;
-                document.getElementById('contact').value = user.contact;
-                document.getElementById('email').value = user.email;
-                document.getElementById('password').value = user.password;
-            }
-        }
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const name = form.querySelector('input[name="name"]').value;
+                const prenom = form.querySelector('input[name="prenom"]').value;
+                const contact = form.querySelector('input[name="contact"]').value;
+                const email = form.querySelector('input[name="email"]').value;
+                const password = form.querySelector('input[name="password"]').value;
+                const method = form.dataset.id ? 'PUT' : 'POST';
+                const url = form.dataset.id ? `/api/users/${form.dataset.id}` : '/api/users';
+                try {
+                    const response = await fetch(url, {
+                        method,
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ name, prenom, contact, email, password })
+                    });
+                    if (response.ok) {
+                        fetchUsers();
+                        form.reset();
+                        delete form.dataset.id;
+                    }
+                } catch (error) {
+                    console.error('Error saving user:', error);
+                }
+            });
 
-        function deleteUser(id) {
-            users = users.filter(u => u.id !== id);
-            loadUsers();
-        }
+            table.addEventListener('click', async (e) => {
+                if (e.target.classList.contains('edit-btn')) {
+                    const id = e.target.dataset.id;
+                    const response = await fetch(`/api/users/${id}`);
+                    const user = await response.json();
+                    form.querySelector('input[name="name"]').value = user.name;
+                    form.querySelector('input[name="prenom"]').value = user.prenom;
+                    form.querySelector('input[name="contact"]').value = user.contact;
+                    form.querySelector('input[name="email"]').value = user.email;
+                    form.querySelector('input[name="password"]').value = user.password;
+                    form.dataset.id = id;
+                } else if (e.target.classList.contains('delete-btn')) {
+                    const id = e.target.dataset.id;
+                    if (confirm('Êtes-vous sûr de vouloir supprimer cet utilisateur ?')) {
+                        await fetch(`/api/users/${id}`, { method: 'DELETE' });
+                        fetchUsers();
+                    }
+                }
+            });
 
-        window.onload = loadUsers;
+            fetchUsers();
+        });
     </script>
 </body>
 </html>

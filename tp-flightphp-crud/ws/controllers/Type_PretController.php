@@ -1,32 +1,70 @@
 <?php
 require_once __DIR__ . '/../models/Type_Pret.php';
-require_once __DIR__ . '/../helpers/Utils.php';
 
 class Type_PretController {
     public static function getAll() {
-        $typePrets = Type_Pret::getAll();
-        Flight::json($typePrets);
+        try {
+            $typePrets = Type_Pret::getAll();
+            Flight::json($typePrets);
+        } catch (Exception $e) {
+            error_log('Erreur lors de la récupération des types de prêt : ' . $e->getMessage());
+            Flight::json(['message' => 'Erreur serveur'], 500);
+        }
     }
 
     public static function getById($id) {
-        $typePret = Type_Pret::getById($id);
-        Flight::json($typePret);
+        try {
+            $typePret = Type_Pret::getById($id);
+            if (!$typePret) {
+                Flight::json(['message' => 'Type de prêt non trouvé'], 404);
+            }
+            Flight::json($typePret);
+        } catch (Exception $e) {
+            error_log('Erreur lors de la récupération du type de prêt : ' . $e->getMessage());
+            Flight::json(['message' => 'Erreur serveur'], 500);
+        }
     }
 
     public static function create() {
-        $data = Flight::request()->data;
-        $id = Type_Pret::create($data);
-        Flight::json(['message' => 'Type Prêt ajouté', 'id' => $id]);
+        try {
+            $data = Flight::request()->data;
+            if (!isset($data->libelle) || !isset($data->taux) || !isset($data->duree)) {
+                Flight::json(['message' => 'Champs requis manquants'], 400);
+            }
+            $id = Type_Pret::create($data);
+            Flight::json(['message' => 'Type Prêt ajouté', 'id' => $id], 201);
+        } catch (Exception $e) {
+            error_log('Erreur lors de la création du type de prêt : ' . $e->getMessage());
+            Flight::json(['message' => 'Erreur serveur'], 500);
+        }
     }
 
     public static function update($id) {
-        $data = Flight::request()->data;
-        Type_Pret::update($id, $data);
-        Flight::json(['message' => 'Type Prêt modifié']);
+        try {
+            $data = Flight::request()->data;
+            if (!isset($data->libelle) || !isset($data->taux) || !isset($data->duree)) {
+                Flight::json(['message' => 'Champs requis manquants'], 400);
+            }
+            Type_Pret::update($id, $data);
+            Flight::json(['message' => 'Type Prêt modifié']);
+        } catch (Exception $e) {
+            error_log('Erreur lors de la mise à jour du type de prêt : ' . $e->getMessage());
+            Flight::json(['message' => 'Erreur serveur'], 500);
+        }
     }
 
     public static function delete($id) {
-        Type_Pret::delete($id);
-        Flight::json(['message' => 'Type Prêt supprimé']);
+        try {
+            $typePret = Type_Pret::getById($id);
+            if (!$typePret) {
+                Flight::json(['message' => 'Type de prêt non trouvé'], 404);
+            }
+            Type_Pret::delete($id);
+            Flight::json(['message' => 'Type Prêt supprimé']);
+        } catch (Exception $e) {
+            error_log('Erreur lors de la suppression du type de prêt : ' . $e->getMessage());
+            Flight::json(['message' => 'Erreur serveur'], 500);
+        }
     }
 }
+?>

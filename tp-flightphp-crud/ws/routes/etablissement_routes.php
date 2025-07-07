@@ -1,14 +1,15 @@
 <?php
-require_once __DIR__.'/../controllers/DepartementController.php';
+require_once __DIR__ . '/../controllers/EtablissementController.php';
 
 // API Routes
-Flight::route('GET /api/departements', ['DepartementController', 'getAll']);
-Flight::route('GET /api/departements/@id', ['DepartementController', 'getById']);
-Flight::route('POST /api/departements', ['DepartementController', 'create']);
-Flight::route('PUT /api/departements/@id', ['DepartementController', 'update']);
-Flight::route('DELETE /api/departements/@id', ['DepartementController', 'delete']);
+Flight::route('GET /api/etablissements', ['EtablissementController', 'getAll']);
+Flight::route('GET /api/etablissements/@id', ['EtablissementController', 'getById']);
+Flight::route('POST /api/etablissements', ['EtablissementController', 'create']);
+Flight::route('PUT /api/etablissements/@id', ['EtablissementController', 'update']);
+Flight::route('DELETE /api/etablissements/@id', ['EtablissementController', 'delete']);
 
-// Route pour servir le HTML
-Flight::route('GET /departements.html', function() {
-    echo file_get_contents(__DIR__.'/../../public/departements.html');
+// Serve HTML page
+Flight::route('GET /etablissements', function() {
+    echo file_get_contents(__DIR__ . '/../../public/etablissements.html');
 });
+?>

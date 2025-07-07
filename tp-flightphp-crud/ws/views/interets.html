@@ -3,111 +3,194 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestion des Intérêts</title>
+    <title>Gérer les Intérêts</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
-<body class="bg-gray-100 font-sans">
-    <header class="bg-blue-600 text-white p-4">
-        <h1 class="text-2xl font-bold">Gestion des Intérêts</h1>
-        <a href="/" class="text-white underline">Retour à l'accueil</a>
-    </header>
-    <main class="container mx-auto p-6">
-        <section class="mb-8">
-            <h2 class="text-xl font-semibold mb-4">Calculer les Intérêts</h2>
-            <div class="bg-white p-4 rounded-lg shadow">
-                <div class="mb-4">
-                    <label for="capital" class="block text-sm font-medium text-gray-700">Capital Initial (€) :</label>
-                    <input type="number" id="capital" class="mt-1 p-2 border rounded w-full" required>
+<body class="flex h-screen bg-gray-100 font-sans">
+    <!-- Sidebar, Header, and Footer remain the same as other HTML files -->
+    <aside class="bg-gray-800 text-white w-64 space-y-6 py-7 px-2 absolute inset-y-0 left-0 transform -translate-x-full md:relative md:translate-x-0 transition duration-200 ease-in-out" id="sidebar">
+        <h2 class="text-2xl font-bold text-center">Menu</h2>
+        <nav>
+            <a href="/departements" class="block py-2.5 px-4 rounded hover:bg-gray-700">Départements</a>
+            <a href="/etablissements" class="block py-2.5 px-4 rounded hover:bg-gray-700">Établissements</a>
+            <a href="/prets" class="block py-2.5 px-4 rounded hover:bg-gray-700">Types de Prêts</a>
+            <a href="/utilisateurs" class="block py-2.5 px-4 rounded hover:bg-gray-700">Utilisateurs</a>
+            <a href="/clients" class="block py-2.5 px-4 rounded hover:bg-gray-700">Clients</a>
+            <a href="/employes" class="block py-2.5 px-4 rounded hover:bg-gray-700">Employés</a>
+            <a href="/interets" class="block py-2.5 px-4 rounded hover:bg-gray-700">Intérêts</a>
+        </nav>
+    </aside>
+
+    <div class="flex-1 flex flex-col">
+        <header class="bg-white shadow p-4 flex justify-between items-center">
+            <h1 class="text-2xl font-semibold">Gérer les Intérêts</h1>
+            <div class="flex space-x-4">
+                <input type="text" placeholder="Search..." class="border rounded px-2 py-1">
+                <div class="flex items-center space-x-2">
+                    <img src="https://via.placeholder.com/30" alt="User" class="rounded-full">
+                    <span>User</span>
                 </div>
-                <div class="mb-4">
-                    <label for="rate" class="block text-sm font-medium text-gray-700">Taux d'Intérêt Annuel (%) :</label>
-                    <input type="number" id="rate" step="0.01" class="mt-1 p-2 border rounded w-full" required>
-                </div>
-                <div class="mb-4">
-                    <label for="startDate" class="block text-sm font-medium text-gray-700">Date Début :</label>
-                    <input type="date" id="startDate" class="mt-1 p-2 border rounded w-full" required>
-                </div>
-                <div class="mb-4">
-                    <label for="endDate" class="block text-sm font-medium text-gray-700">Date Fin :</label>
-                    <input type="date" id="endDate" class="mt-1 p-2 border rounded w-full" required>
-                </div>
-                <button onclick="calculateInterest()" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Enregistrer</button>
+                <button class="bg-green-500 text-white px-4 py-1 rounded">Share</button>
+                <button class="bg-gray-500 text-white px-4 py-1 rounded">Reset Data</button>
             </div>
-        </section>
-        <section>
-            <h2 class="text-xl font-semibold mb-4">Liste des Intérêts</h2>
-            <table id="interestsTable" class="min-w-full bg-white rounded-lg shadow">
-                <thead>
-                    <tr class="bg-gray-200">
-                        <th class="p-2 text-left">Mois</th>
-                        <th class="p-2 text-left">Intérêts (€)</th>
-                        <th class="p-2 text-left">Capital Cumulé (€)</th>
-                        <th class="p-2 text-left">Actions</th>
-                    </tr>
-                </thead>
-                <tbody id="interestsTableBody"></tbody>
-            </table>
-        </section>
-    </main>
+        </header>
+
+        <main class="p-6 flex-1 overflow-auto">
+            <div class="bg-white p-6 rounded-lg shadow">
+                <h2 class="text-xl font-semibold mb-4">Calculer les Intérêts</h2>
+                <form id="interetForm" class="space-y-4">
+                    <div>
+                        <label class="block text-gray-700">Capital Initial (€) :</label>
+                        <input type="number" name="capital" class="w-full border rounded px-3 py-2 mt-1">
+                    </div>
+                    <div>
+                        <label class="block text-gray-700">Taux d'Intérêt Annuel (%) :</label>
+                        <input type="number" step="0.01" name="rate" class="w-full border rounded px-3 py-2 mt-1">
+                    </div>
+                    <div>
+                        <label class="block text-gray-700">Date Début :</label>
+                        <input type="month" name="startDate" class="w-full border rounded px-3 py-2 mt-1">
+                    </div>
+                    <div>
+                        <label class="block text-gray-700">Date Fin :</label>
+                        <input type="month" name="endDate" class="w-full border rounded px-3 py-2 mt-1">
+                    </div>
+                    <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded">Enregistrer</button>
+                </form>
+            </div>
+
+            <div class="mt-6 bg-white p-6 rounded-lg shadow">
+                <h2 class="text-xl font-semibold mb-4">Liste des Intérêts</h2>
+                <table class="w-full mt-2">
+                    <thead>
+                        <tr class="bg-gray-200">
+                            <th class="p-2 text-left">Mois</th>
+                            <th class="p-2 text-left">Intérêts (€)</th>
+                            <th class="p-2 text-left">Capital Cumulé (€)</th>
+                            <th class="p-2 text-left">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="interetsTable"></tbody>
+                </table>
+                <canvas id="interestChart" class="mt-4"></canvas>
+            </div>
+        </main>
+
+        <footer class="bg-gray-800 text-white text-center py-2">
+            <p>© 2023 Plateforme de Gestion. Tous droits réservés.</p>
+        </footer>
+    </div>
+
     <script>
-        let interests = [
-            { id: 1, month: "Janvier 2025", interest: 100, accumulatedCapital: 5100 },
-            { id: 2, month: "Février 2025", interest: 102, accumulatedCapital: 5202 }
-        ];
-
-        function loadInterests() {
-            const tableBody = document.getElementById('interestsTableBody');
-            tableBody.innerHTML = '';
-            interests.forEach(int => {
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td class="p-2">${int.month}</td>
-                    <td class="p-2">${int.interest}</td>
-                    <td class="p-2">${int.accumulatedCapital}</td>
-                    <td class="p-2">
-                        <button onclick="deleteInterest(${int.id})" class="bg-red-500 text-white px-2 py-1 rounded">Supprimer</button>
-                    </td>
-                `;
-                tableBody.appendChild(row);
+        document.addEventListener('DOMContentLoaded', () => {
+            const sidebar = document.getElementById('sidebar');
+            document.querySelector('body').addEventListener('click', (e) => {
+                if (!sidebar.contains(e.target) && window.innerWidth < 768) {
+                    sidebar.classList.add('-translate-x-full');
+                }
             });
-        }
-
-        function calculateInterest() {
-            const capital = parseFloat(document.getElementById('capital').value);
-            const rate = parseFloat(document.getElementById('rate').value);
-            const startDate = new Date(document.getElementById('startDate').value);
-            const endDate = new Date(document.getElementById('endDate').value);
-            if (!capital || !rate || !startDate || !endDate) {
-                alert('Veuillez remplir tous les champs.');
-                return;
-            }
-            const months = (endDate.getFullYear() - startDate.getFullYear()) * 12 + endDate.getMonth() - startDate.getMonth();
-            const monthlyRate = rate / 100 / 12;
-            let accumulatedCapital = capital;
-            for (let i = 0; i < months; i++) {
-                const interest = accumulatedCapital * monthlyRate;
-                accumulatedCapital += interest;
-                const month = new Date(startDate.getFullYear(), startDate.getMonth() + i).toLocaleString('fr-FR', { month: 'long', year: 'numeric' });
-                interests.push({
-                    id: interests.length ? Math.max(...interests.map(i => i.id)) + 1 : 1,
-                    month,
-                    interest: interest.toFixed(2),
-                    accumulatedCapital: accumulatedCapital.toFixed(2)
+            document.querySelectorAll('nav a').forEach(link => {
+                link.addEventListener('click', (e) => {
+                    if (window.innerWidth < 768) {
+                        sidebar.classList.add('-translate-x-full');
+                    }
                 });
+            });
+
+            const form = document.getElementById('interetForm');
+            const table = document.getElementById('interetsTable');
+            let chartInstance = null;
+
+            async function fetchInterets() {
+                try {
+                    const response = await fetch('/api/pret_retours');
+                    const interets = await response.json();
+                    table.innerHTML = '';
+                    const labels = [];
+                    const interestsData = [];
+                    interets.forEach(interet => {
+                        const month = new Date(interet.date).toLocaleString('fr-FR', { month: 'long', year: 'numeric' });
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td class="p-2 border">${month}</td>
+                            <td class="p-2 border">${interet.montant || 'N/A'}</td>
+                            <td class="p-2 border">${interet.capital || 'N/A'}</td>
+                            <td class="p-2 border">
+                                <button class="bg-red-500 text-white px-2 py-1 rounded delete-btn" data-id="${interet.id || 'N/A'}">Delete</button>
+                            </td>
+                        `;
+                        table.appendChild(row);
+                        labels.push(month);
+                        interestsData.push(interet.montant || 0);
+                    });
+
+                    if (chartInstance) chartInstance.destroy();
+                    const ctx = document.getElementById('interestChart').getContext('2d');
+                    chartInstance = new Chart(ctx, {
+                        type: 'line',
+                        data: {
+                            labels: labels,
+                            datasets: [{
+                                label: 'Intérêts Mensuels (€)',
+                                data: interestsData,
+                                borderColor: 'rgba(75, 192, 192, 1)',
+                                fill: false
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            scales: {
+                                y: { beginAtZero: true, title: { display: true, text: 'Intérêts (€)' } },
+                                x: { title: { display: true, text: 'Mois' } }
+                            }
+                        }
+                    });
+                } catch (error) {
+                    console.error('Error fetching interets:', error);
+                    table.innerHTML = '<tr><td colspan="4">Erreur lors du chargement des données.</td></tr>';
+                }
             }
-            document.getElementById('capital').value = '';
-            document.getElementById('rate').value = '';
-            document.getElementById('startDate').value = '';
-            document.getElementById('endDate').value = '';
-            loadInterests();
-        }
 
-        function deleteInterest(id) {
-            interests = interests.filter(i => i.id !== id);
-            loadInterests();
-        }
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const capital = form.querySelector('input[name="capital"]').value;
+                const rate = form.querySelector('input[name="rate"]').value;
+                const startDate = form.querySelector('input[name="startDate"]').value;
+                const endDate = form.querySelector('input[name="endDate"]').value;
+                try {
+                    const response = await fetch('/api/pret_retours/calculate', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ capital, rate, startDate, endDate })
+                    });
+                    if (response.ok) {
+                        const result = await response.json();
+                        await fetch('/api/pret_retours', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ id_client_pret: 1, montant: result[0].interest, date: startDate, capital: result[0].capital })
+                        });
+                        fetchInterets();
+                        form.reset();
+                    }
+                } catch (error) {
+                    console.error('Error saving interet:', error);
+                }
+            });
 
-        window.onload = loadInterests;
+            table.addEventListener('click', async (e) => {
+                if (e.target.classList.contains('delete-btn')) {
+                    const id = e.target.dataset.id;
+                    if (confirm('Êtes-vous sûr de vouloir supprimer cet intérêt ?')) {
+                        await fetch(`/api/pret_retours/${id}`, { method: 'DELETE' });
+                        fetchInterets();
+                    }
+                }
+            });
+
+            fetchInterets();
+        });
     </script>
 </body>
 </html>

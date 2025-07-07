@@ -3,106 +3,158 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestion des Employés</title>
+    <title>Gérer les Employés</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-gray-100 font-sans">
-    <header class="bg-blue-600 text-white p-4">
-        <h1 class="text-2xl font-bold">Gestion des Employés</h1>
-        <a href="/" class="text-white underline">Retour à l'accueil</a>
-    </header>
-    <main class="container mx-auto p-6">
-        <section class="mb-8">
-            <h2 class="text-xl font-semibold mb-4">Ajouter/Modifier un Employé</h2>
-            <div class="bg-white p-4 rounded-lg shadow">
-                <div class="mb-4">
-                    <label for="userId" class="block text-sm font-medium text-gray-700">ID Utilisateur :</label>
-                    <input type="text" id="userId" class="mt-1 p-2 border rounded w-full" required>
+<body class="flex h-screen bg-gray-100 font-sans">
+    <aside class="bg-gray-800 text-white w-64 space-y-6 py-7 px-2 absolute inset-y-0 left-0 transform -translate-x-full md:relative md:translate-x-0 transition duration-200 ease-in-out" id="sidebar">
+        <h2 class="text-2xl font-bold text-center">Menu</h2>
+        <nav>
+            <a href="/departements" class="block py-2.5 px-4 rounded hover:bg-gray-700">Départements</a>
+            <a href="/etablissements" class="block py-2.5 px-4 rounded hover:bg-gray-700">Établissements</a>
+            <a href="/prets" class="block py-2.5 px-4 rounded hover:bg-gray-700">Types de Prêts</a>
+            <a href="/utilisateurs" class="block py-2.5 px-4 rounded hover:bg-gray-700">Utilisateurs</a>
+            <a href="/clients" class="block py-2.5 px-4 rounded hover:bg-gray-700">Clients</a>
+            <a href="/employes" class="block py-2.5 px-4 rounded hover:bg-gray-700">Employés</a>
+            <a href="/interets" class="block py-2.5 px-4 rounded hover:bg-gray-700">Intérêts</a>
+        </nav>
+    </aside>
+
+    <div class="flex-1 flex flex-col">
+        <header class="bg-white shadow p-4 flex justify-between items-center">
+            <h1 class="text-2xl font-semibold">Gérer les Employés</h1>
+            <div class="flex space-x-4">
+                <input type="text" placeholder="Search..." class="border rounded px-2 py-1">
+                <div class="flex items-center space-x-2">
+                    <img src="https://via.placeholder.com/30" alt="User" class="rounded-full">
+                    <span>User</span>
                 </div>
-                <div class="mb-4">
-                    <label for="departmentId" class="block text-sm font-medium text-gray-700">ID Département :</label>
-                    <input type="text" id="departmentId" class="mt-1 p-2 border rounded w-full" required>
-                </div>
-                <button onclick="saveEmployee()" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Enregistrer</button>
+                <button class="bg-green-500 text-white px-4 py-1 rounded">Share</button>
+                <button class="bg-gray-500 text-white px-4 py-1 rounded">Reset Data</button>
             </div>
-        </section>
-        <section>
-            <h2 class="text-xl font-semibold mb-4">Liste des Employés</h2>
-            <table id="employeesTable" class="min-w-full bg-white rounded-lg shadow">
-                <thead>
-                    <tr class="bg-gray-200">
-                        <th class="p-2 text-left">ID</th>
-                        <th class="p-2 text-left">ID Utilisateur</th>
-                        <th class="p-2 text-left">ID Département</th>
-                        <th class="p-2 text-left">Actions</th>
-                    </tr>
-                </thead>
-                <tbody id="employeesTableBody"></tbody>
-            </table>
-        </section>
-    </main>
+        </header>
+
+        <main class="p-6 flex-1 overflow-auto">
+            <div class="bg-white p-6 rounded-lg shadow">
+                <h2 class="text-xl font-semibold mb-4">Ajouter/Modifier un Employé</h2>
+                <form id="employeeForm" class="space-y-4">
+                    <div>
+                        <label class="block text-gray-700">ID Utilisateur :</label>
+                        <input type="text" name="user_id" class="w-full border rounded px-3 py-2 mt-1">
+                    </div>
+                    <div>
+                        <label class="block text-gray-700">ID Département :</label>
+                        <input type="text" name="department_id" class="w-full border rounded px-3 py-2 mt-1">
+                    </div>
+                    <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded">Enregistrer</button>
+                </form>
+            </div>
+
+            <div class="mt-6 bg-white p-6 rounded-lg shadow">
+                <h2 class="text-xl font-semibold mb-4">Liste des Employés</h2>
+                <table class="w-full mt-2">
+                    <thead>
+                        <tr class="bg-gray-200">
+                            <th class="p-2 text-left">ID</th>
+                            <th class="p-2 text-left">ID Utilisateur</th>
+                            <th class="p-2 text-left">ID Département</th>
+                            <th class="p-2 text-left">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="employeesTable"></tbody>
+                </table>
+            </div>
+        </main>
+
+        <footer class="bg-gray-800 text-white text-center py-2">
+            <p>© 2023 Plateforme de Gestion. Tous droits réservés.</p>
+        </footer>
+    </div>
+
     <script>
-        let employees = [
-            { id: 1, userId: "U001", departmentId: "D001" },
-            { id: 2, userId: "U002", departmentId: "D002" }
-        ];
-
-        function loadEmployees() {
-            const tableBody = document.getElementById('employeesTableBody');
-            tableBody.innerHTML = '';
-            employees.forEach(employee => {
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td class="p-2">${employee.id}</td>
-                    <td class="p-2">${employee.userId}</td>
-                    <td class="p-2">${employee.departmentId}</td>
-                    <td class="p-2">
-                        <button onclick="editEmployee(${employee.id})" class="bg-yellow-500 text-white px-2 py-1 rounded">Modifier</button>
-                        <button onclick="deleteEmployee(${employee.id})" class="bg-red-500 text-white px-2 py-1 rounded">Supprimer</button>
-                    </td>
-                `;
-                tableBody.appendChild(row);
+        document.addEventListener('DOMContentLoaded', () => {
+            const sidebar = document.getElementById('sidebar');
+            document.querySelector('body').addEventListener('click', (e) => {
+                if (!sidebar.contains(e.target) && window.innerWidth < 768) {
+                    sidebar.classList.add('-translate-x-full');
+                }
             });
-        }
+            document.querySelectorAll('nav a').forEach(link => {
+                link.addEventListener('click', (e) => {
+                    if (window.innerWidth < 768) {
+                        sidebar.classList.add('-translate-x-full');
+                    }
+                });
+            });
 
-        function saveEmployee() {
-            const userId = document.getElementById('userId').value;
-            const departmentId = document.getElementById('departmentId').value;
-            if (!userId || !departmentId) {
-                alert('Veuillez remplir tous les champs.');
-                return;
+            const form = document.getElementById('employeeForm');
+            const table = document.getElementById('employeesTable');
+
+            async function fetchEmployees() {
+                try {
+                    const response = await fetch('/api/employees');
+                    const employees = await response.json();
+                    table.innerHTML = '';
+                    employees.forEach(employee => {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td class="p-2 border">${employee.id || 'N/A'}</td>
+                            <td class="p-2 border">${employee.user_id || 'N/A'}</td>
+                            <td class="p-2 border">${employee.department_id || 'N/A'}</td>
+                            <td class="p-2 border">
+                                <button class="bg-yellow-500 text-white px-2 py-1 rounded mr-2 edit-btn" data-id="${employee.id}">Edit</button>
+                                <button class="bg-red-500 text-white px-2 py-1 rounded delete-btn" data-id="${employee.id}">Delete</button>
+                            </td>
+                        `;
+                        table.appendChild(row);
+                    });
+                } catch (error) {
+                    console.error('Error fetching employees:', error);
+                    table.innerHTML = '<tr><td colspan="4">Erreur lors du chargement des données.</td></tr>';
+                }
             }
-            const existingEmployee = employees.find(emp => emp.userId === userId);
-            if (existingEmployee) {
-                existingEmployee.userId = userId;
-                existingEmployee.departmentId = departmentId;
-            } else {
-                const newEmployee = {
-                    id: employees.length ? Math.max(...employees.map(e => e.id)) + 1 : 1,
-                    userId,
-                    departmentId
-                };
-                employees.push(newEmployee);
-            }
-            document.getElementById('userId').value = '';
-            document.getElementById('departmentId').value = '';
-            loadEmployees();
-        }
 
-        function editEmployee(id) {
-            const employee = employees.find(e => e.id === id);
-            if (employee) {
-                document.getElementById('userId').value = employee.userId;
-                document.getElementById('departmentId').value = employee.departmentId;
-            }
-        }
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const userId = form.querySelector('input[name="user_id"]').value;
+                const departmentId = form.querySelector('input[name="department_id"]').value;
+                const method = form.dataset.id ? 'PUT' : 'POST';
+                const url = form.dataset.id ? `/api/employees/${form.dataset.id}` : '/api/employees';
+                try {
+                    const response = await fetch(url, {
+                        method,
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ user_id: userId, department_id: departmentId })
+                    });
+                    if (response.ok) {
+                        fetchEmployees();
+                        form.reset();
+                        delete form.dataset.id;
+                    }
+                } catch (error) {
+                    console.error('Error saving employee:', error);
+                }
+            });
 
-        function deleteEmployee(id) {
-            employees = employees.filter(e => e.id !== id);
-            loadEmployees();
-        }
+            table.addEventListener('click', async (e) => {
+                if (e.target.classList.contains('edit-btn')) {
+                    const id = e.target.dataset.id;
+                    const response = await fetch(`/api/employees/${id}`);
+                    const employee = await response.json();
+                    form.querySelector('input[name="user_id"]').value = employee.user_id;
+                    form.querySelector('input[name="department_id"]').value = employee.department_id;
+                    form.dataset.id = id;
+                } else if (e.target.classList.contains('delete-btn')) {
+                    const id = e.target.dataset.id;
+                    if (confirm('Êtes-vous sûr de vouloir supprimer cet employé ?')) {
+                        await fetch(`/api/employees/${id}`, { method: 'DELETE' });
+                        fetchEmployees();
+                    }
+                }
+            });
 
-        window.onload = loadEmployees;
+            fetchEmployees();
+        });
     </script>
 </body>
 </html>
