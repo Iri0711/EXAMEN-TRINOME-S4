@@ -2,6 +2,25 @@
 require 'vendor/autoload.php';
 require 'db.php';
 
+Flight::before('start', function() {
+    header("Access-Control-Allow-Origin: *");
+    header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS");
+    header("Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With");
+    
+    if (Flight::request()->method === 'OPTIONS') {
+        Flight::halt(204);
+    }
+});
+
+// Formatage JSON cohérent
+Flight::map('json', function($data, $code = 200, $options = JSON_UNESCAPED_UNICODE) {
+    Flight::response()
+        ->status($code)
+        ->header('Content-Type', 'application/json')
+        ->write(json_encode($data, $options))
+        ->send();
+});
+
 Flight::route('GET /etudiants', function() {
     try {
         $db = getDB();
