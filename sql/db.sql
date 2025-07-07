@@ -1,0 +1,4 @@
+DROP DATABASE banque;
+CREATE DATABASE banque CHARACTER SET utf8mb4;
+
+USE banque;
