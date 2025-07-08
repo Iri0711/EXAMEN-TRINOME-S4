@@ -1,7 +1,12 @@
 <?php
 require 'vendor/autoload.php';
 require 'db.php';
-require 'routes/.php';
+// Load all route files
+$routesDir = 'routes';
+foreach (glob("$routesDir/*.php") as $routeFile) {
+    require $routeFile;
+}
+
 
 Flight::route('GET /', function() {
     readfile('../index.html');
@@ -56,7 +61,7 @@ Flight::route('POST /ws/login', function() {
 Flight::route('GET /ws/funds', function() {
     $db = getDB();
 
-System: db->query("SELECT ef.*, e.designation FROM Etablissement_Fond ef JOIN Etablissement e ON ef.id_etab = e.id");
+    $stmt = $db->query("SELECT ef.*, e.designation FROM Etablissement_Fond ef JOIN Etablissement e ON ef.id_etab = e.id");
     Flight::json($stmt->fetchAll(PDO::FETCH_ASSOC));
 });
 

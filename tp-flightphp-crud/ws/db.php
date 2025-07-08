@@ -1,15 +1,14 @@
 <?php
 function getDB() {
-    $host = 'localhost';
-    $dbname = 'banque';
-    $username = 'root';
-    $password = '';
-
     try {
-        return new PDO("mysql:host=$host;dbname=$dbname;charset=utf8", $username, $password, [
-            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION
-        ]);
+        $db = new PDO('mysql:host=localhost;dbname=banque', 'root', '');
+        $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        return $db;
     } catch (PDOException $e) {
-        die(json_encode(['error' => $e->getMessage()]));
+        // Log l'erreur pour le débogage
+        error_log("Erreur de connexion à la base de données : " . $e->getMessage());
+        http_response_code(500);
+        echo json_encode(['error' => 'Erreur de connexion à la base de données']);
+        exit;
     }
 }

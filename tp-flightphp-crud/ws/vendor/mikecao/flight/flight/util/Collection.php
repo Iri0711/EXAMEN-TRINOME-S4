@@ -78,6 +78,7 @@ class Collection implements \ArrayAccess, \Iterator, \Countable, \JsonSerializab
      * @param string $offset Offset
      * @return mixed Value
      */
+    #[\ReturnTypeWillChange]
     public function offsetGet($offset) {
         return isset($this->data[$offset]) ? $this->data[$offset] : null;
     }
@@ -88,7 +89,8 @@ class Collection implements \ArrayAccess, \Iterator, \Countable, \JsonSerializab
      * @param string $offset Offset
      * @param mixed $value Value
      */
-    public function offsetSet($offset, $value) {
+    #[\ReturnTypeWillChange]
+     public function offsetSet($offset, $value) {
         if (is_null($offset)) {
             $this->data[] = $value;
         }
@@ -103,6 +105,7 @@ class Collection implements \ArrayAccess, \Iterator, \Countable, \JsonSerializab
      * @param string $offset Offset
      * @return bool Item status
      */
+    #[\ReturnTypeWillChange]
     public function offsetExists($offset) {
         return isset($this->data[$offset]);
     }
@@ -112,6 +115,7 @@ class Collection implements \ArrayAccess, \Iterator, \Countable, \JsonSerializab
      *
      * @param string $offset Offset
      */
+    #[\ReturnTypeWillChange]
     public function offsetUnset($offset) {
         unset($this->data[$offset]);
     }
@@ -119,6 +123,7 @@ class Collection implements \ArrayAccess, \Iterator, \Countable, \JsonSerializab
     /**
      * Resets the collection.
      */
+    #[\ReturnTypeWillChange]
     public function rewind() {
         reset($this->data);
     }
@@ -128,6 +133,7 @@ class Collection implements \ArrayAccess, \Iterator, \Countable, \JsonSerializab
      *
      * @return mixed Value
      */ 
+    #[\ReturnTypeWillChange]
     public function current() {
         return current($this->data);
     }
@@ -137,6 +143,7 @@ class Collection implements \ArrayAccess, \Iterator, \Countable, \JsonSerializab
      *
      * @return mixed Value
      */ 
+    #[\ReturnTypeWillChange]
     public function key() {
         return key($this->data);
     }
@@ -146,6 +153,7 @@ class Collection implements \ArrayAccess, \Iterator, \Countable, \JsonSerializab
      *
      * @return mixed Value
      */ 
+    #[\ReturnTypeWillChange]
     public function next() 
     {
         return next($this->data);
@@ -156,6 +164,7 @@ class Collection implements \ArrayAccess, \Iterator, \Countable, \JsonSerializab
      *
      * @return bool Key status
      */ 
+    #[\ReturnTypeWillChange]
     public function valid()
     {
         $key = key($this->data);
@@ -167,6 +176,7 @@ class Collection implements \ArrayAccess, \Iterator, \Countable, \JsonSerializab
      *
      * @return int Collection size
      */
+    #[\ReturnTypeWillChange]
     public function count() {
         return sizeof($this->data);
     }
@@ -203,6 +213,7 @@ class Collection implements \ArrayAccess, \Iterator, \Countable, \JsonSerializab
      *
      * @return array Collection data which can be serialized by <b>json_encode</b>
      */
+    #[\ReturnTypeWillChange]
     public function jsonSerialize() {
         return $this->data;
     }

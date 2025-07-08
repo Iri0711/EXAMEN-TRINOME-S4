@@ -1,32 +1,64 @@
 <?php
+require_once __DIR__ . '/../models/Type_pret.php';
 require_once __DIR__ . '/../models/Pret.php';
 require_once __DIR__ . '/../helpers/Utils.php';
+require_once __DIR__ . '/../models/Retour.php';
 
 class PretController {
-    public static function getAll() {
+
+
+    // TOUT LES PRETS
+    public static function getAllPrets() {
         $prets = Pret::getAll();
         Flight::json($prets);
     }
 
-    public static function getById($id) {
-        $pret = Pret::getById($id);
-        Flight::json($pret);
-    }
+    public static function createPret() {
+        error_log("CREATE PRET CALLED");
+        error_log("Request Data: " . json_encode(Flight::request()->data));
 
-    public static function create() {
         $data = Flight::request()->data;
-        $id = Pret::create($data);
-        Flight::json(['message' => 'Prêt ajouté', 'id' => $id]);
+        $result = Pret::create($data);
+        
+        if ($result['success']) {
+            Flight::json([
+                'message' => $result['message'],
+                'id' => $result['id']
+            ], 201);
+        } else {
+            Flight::json(['error' => $result['error']], 400);
+        }
     }
 
-    public static function update($id) {
+    // TYPES DE PRET
+    public static function getAllTypesPret() {
+        $types = Type_pret::getAll();
+        Flight::json($types);
+    }
+
+    // public static function getById($id) {
+    //     $pret = Type_pret::getById($id);
+    //     Flight::json($pret);
+    
+
+    public static function createTypePret() {
         $data = Flight::request()->data;
-        Pret::update($id, $data);
-        Flight::json(['message' => 'Prêt modifié']);
+        $id = Type_pret::create($data);
+        Flight::json(['message' => 'Type de prêt ajouté', 'id' => $id]);
     }
 
-    public static function delete($id) {
-        Pret::delete($id);
-        Flight::json(['message' => 'Prêt supprimé']);
+
+
+    /// RETOUR DES PRETS
+
+    public static function getAllRetours() {
+        $retours = Retour::getAll();
+        Flight::json($retours);
     }
+    public static function createRetour() {
+        $data = Flight::request()->data;
+        $id = Retour::create($data);
+        Flight::json(['message' => 'Retour de prêt ajouté', 'id' => $id]);
+    }
+
 }

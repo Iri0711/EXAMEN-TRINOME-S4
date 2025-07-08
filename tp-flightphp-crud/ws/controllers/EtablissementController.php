@@ -2,15 +2,30 @@
 require_once __DIR__ . '/../models/Etablissement.php';
 require_once __DIR__ . '/../helpers/Utils.php';
 
+header('Access-Control-Allow-Origin: *'); // Allow all origins (restrict in production)
+header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE');
+header('Access-Control-Allow-Headers: Content-Type');
+
 class EtablissementController {
     public static function getAll() {
-        $etablissements = Etablissement::getAll();
-        Flight::json($etablissements);
+        try {
+            $etablissements = EtablissementFond::getAll();
+            Flight::json($etablissements);
+        } catch (Exception $e) {
+            error_log('Error in getAll: ' . $e->getMessage());
+            http_response_code(500);
+            Flight::json(['error' => 'Server error occurred']);
+        }
     }
-
     public static function getById($id) {
-        $etablissement = Etablissement::getById($id);
-        Flight::json($etablissement);
+        try {
+            $etablissement = Etablissement::getById($id);
+            Flight::json($etablissement);
+        } catch (Exception $e) {
+            error_log('Error in getById: ' . $e->getMessage());
+            http_response_code(500);
+            Flight::json(['error' => 'Server error occurred']);
+        }
     }
 
     public static function create() {
