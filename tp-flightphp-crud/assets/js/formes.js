@@ -17,33 +17,61 @@
     });
 
 
-function createCourbe(id,titre,max,data,labels){
-    const ctx = document.getElementById(id).getContext('2d');
-
-        const myChart = new Chart(ctx, {
-            type: 'line',
-            data: {
-            labels:labels, 
+function createCourbe(id, titre, max, data, labels) {
+    // 1. Récupérer l'élément canvas (pas son contexte)
+    const canvas = document.getElementById(id);
+    
+    // 2. Détruire l'instance existante
+    if (chartInstance) {
+        chartInstance.destroy();
+        chartInstance = null;
+    }
+    
+    // 3. Réinitialisation complète du canvas
+    const parent = canvas.parentNode;
+    const newCanvas = document.createElement('canvas');
+    newCanvas.id = id;
+    parent.replaceChild(newCanvas, canvas); // Remplacement propre
+    
+    // 4. Création du nouveau graphique
+    chartInstance = new Chart(newCanvas.getContext('2d'), {
+        type: 'line',
+        data: {
+            labels: labels,
             datasets: [{
                 label: titre,
                 data: data,
                 fill: true,
                 borderColor: '#3AB7D9',
-                tension: 0.4
+                tension: 0.4,
+                backgroundColor: 'rgba(58, 183, 217, 0.1)' // Ajout recommandé
             }]
-            },
-            options: {
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        max: max
+        },
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    max: max,
+                    grid: {
+                        color: 'rgba(0,0,0,0.05)'
                     }
                 },
-                responsive:true,
-                maintainAspectRatio:false
+                x: {
+                    grid: {
+                        display: false
+                    }
+                }
+            },
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'top',
+                }
             }
-        });
-};
+        }
+    });
+}
 function createPolar(id,titre,data,labels){
     const ctx = document.getElementById(id).getContext('2d');
     const gradient = ctx.createLinearGradient(0, 300, 100, 0); // haut → bas

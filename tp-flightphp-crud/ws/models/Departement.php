@@ -16,16 +16,37 @@ class Departement {
     }
 
     public static function create($data) {
+        error_log("INSERT");
         $db = getDB();
-        $stmt = $db->prepare("INSERT INTO departement (nom, description, responsable) VALUES (?, ?, ?)");
-        $stmt->execute([$data->nom, $data->description, $data->responsable]);
+        
+        // Conversion robuste en booléen
+        $autorise = filter_var($data->autorise, FILTER_VALIDATE_BOOLEAN);
+        
+        $stmt = $db->prepare("INSERT INTO departement (designation, autorise) VALUES (?, ?)");
+        
+        // Convertir le booléen en entier pour MySQL (1 ou 0)
+        $stmt->execute([
+            $data->designation, 
+            $autorise ? 1 : 0
+        ]);
+        
         return $db->lastInsertId();
     }
 
     public static function update($id, $data) {
+        error_log("UPDATEMODEL");
+        error_log($id);
+        error_log(json_encode($data));
         $db = getDB();
-        $stmt = $db->prepare("UPDATE departement SET nom = ?, description = ?, responsable = ? WHERE id = ?");
-        $stmt->execute([$data->nom, $data->description, $data->responsable, $id]);
+        
+        // Convertir la valeur numérique en boolean
+        $autorise = filter_var($data->autorise, FILTER_VALIDATE_BOOLEAN);
+        
+        $stmt = $db->prepare("UPDATE departement SET designation= ?, autorise=? WHERE id=?");
+        
+        // Utiliser les bonnes variables (remarquez que j'ai enlevé $data->nom qui n'est pas dans votre requête SQL)
+        $stmt->execute([$data->designation, $autorise ? 1 : 0,$id]);
+
     }
 
     public static function delete($id) {

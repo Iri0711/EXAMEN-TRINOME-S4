@@ -3,15 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin - Gestion des Prêts Bancaires</title>
-   
-     <link rel="stylesheet" href="assets/css/general.css">
-     <link rel="stylesheet" href="assets/css/index.css">
-     <link rel="stylesheet" href="assets/css/formes.css">
-     <link rel="stylesheet" href="assets/css/carte.css">
-     <link rel="stylesheet" href="assets/css/tables.css">
-     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
+    <title>Admin - Gestion des Départements</title>
+    <link rel="stylesheet" href="assets/css/general.css">
+    <link rel="stylesheet" href="assets/css/index.css">
+    <link rel="stylesheet" href="assets/css/formes.css">
+    <link rel="stylesheet" href="assets/css/carte.css">
+    <link rel="stylesheet" href="assets/css/tables.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
     <div class="main-container">
@@ -20,7 +18,7 @@
             <nav>
                 <ul>
                     <li>
-                        <button class="dropdown-btn" >Dashboard</button>
+                        <button class="dropdown-btn">Dashboard</button>
                         <ul class="dropdown-content">
                             <li><a href="index.html">Interets</a></li>
                         </ul>
@@ -30,162 +28,226 @@
                         <ul class="dropdown-content">
                             <li><a href="demandes.html">Fonds</a></li>
                             <li><a href="demandes.html">Prets</a></li>
-                            
                         </ul>
                     </li>
                     <li>
                         <button class="dropdown-btn">Crud</button>
                         <ul class="dropdown-content">
                             <li><a href="users.html">User</a></li>
-                            <li><a href="departements.html">Departement</a></li>
+                            <li><a href="departements.html">Département</a></li>
                             <li><a href="etablissements.html">Etablissement</a></li>
                             <li><a href="typeprets.html">Type de pret</a></li>
                             <li><a href="clients.html">Client</a></li>
                             <li><a href="employes.html">Employe</a></li>
                         </ul>
                     </li>
-                    
                 </ul>
             </nav>
         </div>
         <div class="content">
-             <div class="full table">
+            <div class="full table">
                 <div class="full search">
-                        <div class="title">
-                            <span>Listes des materiaux</span>
-                        </div>
-                        <div class="input">
-                            <a onclick="myModal()" class="validate">Ajouter</a>
-                        </div>
-                        
+                    <div class="title">
+                        <span>Liste des départements</span>
+                    </div>
+                    <div class="input">
+                        <a onclick="myModal()" class="validate">Ajouter</a>
+                    </div>
                 </div> 
                 <div class="full table-content">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>Designation</th>
-
-                                    <th>
-                                        Action
-                                    </th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                
-                                <tr>
-                                    <td>ANDRIANKIRIJA</td>
-                                    <td>
-                                        <a href="#" class="validate">Valider</a>
-                                        <a href="#" class="modify">Modifier</a>
-                                        <a href="#" class="delete">Supprimer</a>
-                                        <a href="#" class="cancel">Annuler</a>
-                                    </td>
-                                </tr>
-                               
-                                
-                                
-                            </tbody>
-                        </table>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Désignation</th>
+                                <th>Autorisé</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Les données seront chargées ici par JavaScript -->
+                        </tbody>
+                    </table>
                 </div>
-                <div class="table-footer">
-                        <a href="#"><img src="assets/images/arrow_back_ios_100dp_FFFFFF_FILL0_wght400_GRAD0_opsz48.png" alt=""></a>
-                        <a href="#">1</a>
-                        <a href="#">...</a>
-                        <a href="#">3</a>
-                        <a href="#"><img src="assets/images/arrow_forward_ios_100dp_FFFFFF_FILL0_wght400_GRAD0_opsz48.png" alt=""></a>
-                </div>
-                </div>
+                <div class="table-footer"></div>
+                
                 <div class="form" id="form">
-                    <a onclick="fermer()" class="close"><img src="assets/images/close_100dp_000000_FILL0_wght400_GRAD0_opsz48.png" alt="" srcset=""></a>
+                    <a onclick="fermer()" class="close"><img src="assets/images/close_100dp_000000_FILL0_wght400_GRAD0_opsz48.png" alt="Fermer"></a>
                     <div class="formulaire">
-                        <div class="formulaire-header">
-                            Formulaire d'ajout d'utilisateur
+                        <div class="formulaire-header" id="form-title">
+                            Formulaire d'ajout de département
                         </div>
                         <div class="formulaire-content">
-                            <!-- Partie 1: Identité -->
-                            <fieldset class="form-section" id="section-identite">
-                                <legend>Informations du departement</legend>
-                                <div class="element">
-                                    <input type="text" name="designation" id="designation" placeholder=" " required>
-                                    <label for="designation">Designation</label>
-                                </div>
-                                <div class="element">
-                                    <input type="number" name="autorise" id="autorise" placeholder=" " required>
-                                    <label for="prenom">Autorise</label>
-                                </div>
-                            </fieldset>
-
+                            <div class="element">
+                                <input type="text" name="designation" id="designation" placeholder=" " required>
+                                <label for="designation">Désignation</label>
+                            </div>
+                            <div class="element">
+                                <input type="number" name="autorise" min="0" max="1" id="autorise" placeholder=" " required>
+                                <label for="autorise">Autorisé (0 ou 1)</label>
+                            </div>
                         </div>
                         <div class="formulaire-footer">
-                            <button type="button" class="btn-prev validate" onclick="prevSection()" style="display:none;">Précédent</button>
-                            <button type="button" class="btn-next validate" onclick="nextSection()" style="display:none;">Suivant</button>
                             <button type="button" class="btn-submit validate" onclick="submitForm()">Valider</button>
                         </div>
                     </div>
                 </div>
-                
-                
-        
+            </div>
         </div>
     </div>
+<script src="assets/js/ajax.js"></script>
     <script>
-        // Fonctions pour la navigation entre sections
-        function nextSection() {
-            document.getElementById('section-identite').style.display = 'none';
-            document.getElementById('section-auth').style.display = 'flex';
-            document.querySelector('.btn-prev').style.display = 'inline-block';
-            document.querySelector('.btn-next').style.display = 'none';
-            document.querySelector('.btn-submit').style.display = 'inline-block';
+        
+        // Variable globale pour stocker l'ID du département en cours de modification
+        var currentDeptId = -1;
+
+        // Charger les données au démarrage
+        window.addEventListener('DOMContentLoaded', () => {
+            loadDepartments();
+        });
+
+        // Fonction pour charger les départements
+        function loadDepartments() {
+            ajax('GET', '/departements', null, (response) => {
+                if (response?.success && response?.data?.length) {
+                    createDepartmentsTable(response.data);
+                    setupActionButtons();
+                } else {
+                    displayTableMessage('Aucun département trouvé');
+                }
+            }, (error) => {
+                console.error("Erreur:", error);
+                displayTableMessage('Erreur de chargement des données');
+            });
         }
 
-        function prevSection() {
-            document.getElementById('section-identite').style.display = 'flex';
-            document.getElementById('section-auth').style.display = 'none';
-            document.querySelector('.btn-prev').style.display = 'none';
-            document.querySelector('.btn-next').style.display = 'inline-block';
-            document.querySelector('.btn-submit').style.display = 'none';
+        // Fonction pour créer le tableau des départements
+        function createDepartmentsTable(departmentsData) {
+            const tableContent = document.querySelector('.full.table-content tbody');
+            tableContent.innerHTML = '';
+            
+            departmentsData.forEach((dept) => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${dept.id || ''}</td>
+                    <td>${dept.designation || ''}</td>
+                    <td>${dept.autorise === 1 ? 'Oui' : 'Non'}</td>
+                    <td>
+                        <a href="#" class="modify">Modifier</a>
+                        <a href="#" class="delete">Supprimer</a>
+                    </td>
+                `;
+                tableContent.appendChild(row);
+            });
         }
 
+        // Fonction pour afficher un message dans le tableau
+        function displayTableMessage(message) {
+            const tableContent = document.querySelector('.full.table-content tbody');
+            tableContent.innerHTML = `<tr><td colspan="4" style="text-align: center;">${message}</td></tr>`;
+        }
+
+        // Fonction pour configurer les boutons d'action
+        function setupActionButtons() {
+            document.querySelectorAll('.modify').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const row = e.target.closest('tr');
+                    fillFormWithDepartmentData(row);
+                    myModal();
+                });
+            });
+            
+            document.querySelectorAll('.delete').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    if(confirm("Voulez-vous vraiment supprimer ce département ?")) {
+                        const deptId = e.target.closest('tr').cells[0].textContent;
+                        deleteDepartment(deptId);
+                    }
+                });
+            });
+        }
+
+        // Fonction pour remplir le formulaire avec les données d'un département
+        function fillFormWithDepartmentData(row) {
+            currentDeptId = row.cells[0].textContent;
+            document.getElementById('designation').value = row.cells[1].textContent;
+            document.getElementById('autorise').value = row.cells[2].textContent === 'Oui' ? 1 : 0;
+            
+            // Changer le titre du formulaire
+            document.getElementById('form-title').textContent = "Modification de département";
+        }
+
+        // Fonction pour supprimer un département
+        function deleteDepartment(deptId) {
+            ajax('DELETE', `/departements/${deptId}`, null, (response) => {
+                if(response.success) {
+                    alert("Département supprimé avec succès");
+                    loadDepartments();
+                } else {
+                    alert("Erreur lors de la suppression");
+                }
+            });
+        }
+
+        // Fonction pour soumettre le formulaire
         function submitForm() {
-            // Validation des champs
-            const nom = document.getElementById('designation').value;
-            const prenom = document.getElementById('autorise').value;
+            const designation = document.getElementById('designation').value;
+            const autorise = document.getElementById('autorise').value;
             
-            
-            if (!nom || !prenom) {
-                alert('Veuillez remplir tous les champs obligatoires de la section Identité');
-                prevSection();
+            if (!designation || autorise === '') {
+                alert('Veuillez remplir tous les champs obligatoires');
                 return;
             }
-            
-         
-            
-            // Ici vous pouvez ajouter le code pour soumettre le formulaire
-            alert('Formulaire soumis avec succès!');
-            fermer();
-            
-            // Réinitialiser le formulaire
-            document.querySelector('form').reset();
+
+            if (currentDeptId === -1) {
+
+                ajax('POST', '/departements', {designation:designation, autorise:autorise}, (response) => {
+                  
+                    if (response?.success) {
+                        alert(response?.message);
+                        loadDepartments();
+                        fermer();
+                    } else {
+                        alert("Erreur lors de l'ajout");
+                    }
+                });
+            } else {
+                // Modification d'un département existant
+                alert("eto");
+                ajax('PUT', `/departements/${currentDeptId}`, {designation:designation, autorise:autorise}, (response) => {
+                    alert("tsa tonga");
+                    if (response?.success) {
+                        alert(response?.message);
+                        loadDepartments();
+                        fermer();
+                    } else {
+                        alert("Erreur lors de la modification");
+                    }
+                });
+            }
         }
 
-        function myModal(){
-            var form=document.getElementById("form");
-            form.style.display="flex";
-            // Réinitialiser l'affichage des sections
-            document.getElementById('section-identite').style.display = 'flex';
-            document.getElementById('section-auth').style.display = 'none';
-            document.querySelector('.btn-prev').style.display = 'none';
-            document.querySelector('.btn-next').style.display = 'none';
-            document.querySelector('.btn-submit').style.display = 'inline-block';
+        // Fonction pour ouvrir le modal
+        function myModal() {
+            // Réinitialiser le formulaire
+            
+            
+            
+            var form = document.getElementById("form");
+           
+            form.style.display = "flex";
         };
         
-        function fermer(){
-            var form=document.getElementById("form");
-            form.style.display="none";
+        // Fonction pour fermer le modal
+        function fermer() {
+            var form = document.getElementById("form");
+            form.style.display = "none";
+            currentDeptId = -1; // Réinitialiser l'ID
         };
     </script>
     <script src="assets/js/admin_index.js"></script>
     <script src="assets/js/formes.js"></script>
-
 </body>
 </html>

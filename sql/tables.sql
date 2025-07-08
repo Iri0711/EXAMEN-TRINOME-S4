@@ -1,88 +1,105 @@
--- Table User
 CREATE TABLE `User` (
-  `id` INT AUTO_INCREMENT PRIMARY KEY,
-  `nom` VARCHAR(255) NOT NULL,
-  `prenom` VARCHAR(255) NOT NULL,
-  `contact` VARCHAR(255),
-  `email` VARCHAR(255) UNIQUE,
-  `mdp` VARCHAR(255) NOT NULL
-) ENGINE=InnoDB;
+  `id` integer,
+  `nom` text,
+  `prenom` text,
+  `contact` text,
+  `email` text,
+  `mdp` text
+);
 
--- Table Departement
 CREATE TABLE `Departement` (
-  `id` INT AUTO_INCREMENT PRIMARY KEY,
-  `designation` VARCHAR(255) NOT NULL,
-  `autorise` TINYINT(1) DEFAULT 0
-) ENGINE=InnoDB;
+  `id` integer,
+  `designation` text,
+  `autorise` boolean
+);
 
--- Table Employe
 CREATE TABLE `Employe` (
-  `id` INT AUTO_INCREMENT PRIMARY KEY,
-  `id_user` INT NOT NULL,
-  `id_dept` INT NOT NULL,
-  FOREIGN KEY (`id_user`) REFERENCES `User` (`id`),
-  FOREIGN KEY (`id_dept`) REFERENCES `Departement` (`id`)
-) ENGINE=InnoDB;
+  `id` integer,
+  `id_user` integer,
+  `id_dept` integer
+);
 
--- Table Client
 CREATE TABLE `Client` (
-  `id` INT AUTO_INCREMENT PRIMARY KEY,
-  `id_user` INT NOT NULL,
-  FOREIGN KEY (`id_user`) REFERENCES `User` (`id`)
-) ENGINE=InnoDB;
+  `id` integer,
+  `id_user` integer
+);
 
--- Table Etablissement
 CREATE TABLE `Etablissement` (
-  `id` INT AUTO_INCREMENT PRIMARY KEY,
-  `designation` VARCHAR(255) NOT NULL,
-  `adresse` TEXT
-) ENGINE=InnoDB;
+  `id` integer,
+  `designation` text,
+  `adresse` text
+);
 
--- Table Etablissement_Fond
 CREATE TABLE `Etablissement_Fond` (
-  `id` INT AUTO_INCREMENT PRIMARY KEY,
-  `id_etab` INT NOT NULL,
-  `montant` DECIMAL(10,2) NOT NULL,
-  `date` DATE NOT NULL,
-  `libelle` TEXT,
-  FOREIGN KEY (`id_etab`) REFERENCES `Etablissement` (`id`)
-) ENGINE=InnoDB;
+  `id` integer,
+  `id_etab` integer,
+  `montant` decimal,
+  `date` date,
+  `libelle` text
+);
 
--- Table Fond_Validation
 CREATE TABLE `Fond_Validation` (
-  `id` INT AUTO_INCREMENT PRIMARY KEY,
-  `id_etab_fond` INT NOT NULL,
-  `statut` TINYINT(1) DEFAULT 0,
-  `date` DATE NOT NULL,
-  FOREIGN KEY (`id_etab_fond`) REFERENCES `Etablissement_Fond` (`id`)
-) ENGINE=InnoDB;
+  `id` integer,
+  `id_etab_fond` integer,
+  `statut` boolean,
+  `date` date
+);
 
--- Table Pret_Type
-CREATE TABLE `Pret_Type` (
-  `id` INT AUTO_INCREMENT PRIMARY KEY,
-  `libelle` VARCHAR(255) NOT NULL,
-  `taux` DECIMAL(5,2) NOT NULL,
-  `duree` INT NOT NULL
-) ENGINE=InnoDB;
-
--- Table Pret_Client
-CREATE TABLE `Pret_Client` (
-  `id` INT AUTO_INCREMENT PRIMARY KEY,
-  `id_client` INT NOT NULL,
-  `id_etab` INT NOT NULL,
-  `id_pret_type` INT NOT NULL,
-  `montant` DECIMAL(10,2) NOT NULL,
-  `date` DATE NOT NULL,
-  FOREIGN KEY (`id_client`) REFERENCES `Client` (`id`),
-  FOREIGN KEY (`id_etab`) REFERENCES `Etablissement` (`id`),
-  FOREIGN KEY (`id_pret_type`) REFERENCES `Pret_Type` (`id`)
-) ENGINE=InnoDB;
-
--- Table Pret_Retour
 CREATE TABLE `Pret_Retour` (
-  `id` INT AUTO_INCREMENT PRIMARY KEY,
-  `id_client_pret` INT NOT NULL,
-  `montant` DECIMAL(10,2) NOT NULL,
-  `date` DATE NOT NULL,
-  FOREIGN KEY (`id_client_pret`) REFERENCES `Pret_Client` (`id`)
-) ENGINE=InnoDB;
+  `id` integer,
+  `id_client_pret` integer,
+  `montant` decimal,
+  `date` date
+);
+
+CREATE TABLE `Pret_Type` (
+  `id` integer,
+  `libelle` integer,
+  `taux` decimal,
+  `duree` integer
+);
+
+CREATE TABLE `Pret_Assurance` (
+  `id` integer PRIMARY KEY,
+  `id_client_pret` integer,
+  `montant` decimal,
+  `description` text,
+  FOREIGN KEY (`id_client_pret`) REFERENCES `Pret_Client`(`id`)
+);
+
+CREATE TABLE `Pret_Client` (
+  `id` integer,
+  `id_client` integer,
+  `id_etab` integer,
+  `id_pret_type` integer,
+  `montant` decimal,
+  `date` date,
+  `duree integer
+);
+
+ALTER TABLE `Employe` ADD FOREIGN KEY (`id_user`) REFERENCES `User` (`id`);
+
+ALTER TABLE `Employe` ADD FOREIGN KEY (`id_dept`) REFERENCES `Departement` (`id`);
+
+ALTER TABLE `Client` ADD FOREIGN KEY (`id_user`) REFERENCES `User` (`id`);
+
+ALTER TABLE `Etablissement_Fond` ADD FOREIGN KEY (`id_etab`) REFERENCES `Etablissement` (`id`);
+
+ALTER TABLE `Fond_Validation` ADD FOREIGN KEY (`id_etab_fond`) REFERENCES `Etablissement_Fond` (`id`);
+
+ALTER TABLE `Pret_Client` ADD FOREIGN KEY (`id_client`) REFERENCES `Client` (`id`);
+
+ALTER TABLE `Pret_Client` ADD FOREIGN KEY (`id_etab`) REFERENCES `Etablissement` (`id`);
+
+ALTER TABLE `Pret_Client` ADD FOREIGN KEY (`id_pret_type`) REFERENCES `Pret_Type` (`id`);
+
+ALTER TABLE `Pret_Retour` ADD FOREIGN KEY (`id_client_pret`) REFERENCES `Pret_Client` (`id`);
+
+ALTER TABLE `Pret_Assurance` ADD FOREIGN KEY (`id_client_pret`) REFERENCES `Pret_Client` (`id`);
+
+ALTER TABLE `Pret_Client` ADD COLUMN duree INTEGER;
+
+UPDATE `Pret_Client` SET duree = 365 WHERE id=1;
+UPDATE `Pret_Client` SET duree = 700 WHERE id=2;
+UPDATE `Pret_Client` SET duree = 250 WHERE id=3;
+

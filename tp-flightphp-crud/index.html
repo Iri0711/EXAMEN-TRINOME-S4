@@ -8,6 +8,7 @@
      <link rel="stylesheet" href="assets/css/general.css">
      <link rel="stylesheet" href="assets/css/index.css">
      <link rel="stylesheet" href="assets/css/formes.css">
+     <link rel="stylesheet" href="assets/css/tables.css">
      <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 </head>
@@ -47,31 +48,273 @@
             </nav>
         </div>
         <div class="content">
+            
             <div class="full">
-                <div class="card">
-                    <div class="card-header">
-                        Interets par mois 
-                    </div>
-                    <div class="card-content">
-                        <div class="courbe">
-                            <canvas id="myChart"></canvas>
+                <div class="width-70">
+                    <div class="card">
+                        <div class="card-header">
+                            Interets par mois 
                         </div>
+                        <div class="card-content">
+                            <div class="courbe">
+                                <canvas id="myChart"></canvas>
+                            </div>
 
-                    </div>
-                    <div class="card-footer">
-                        
+                        </div>
+                        <div class="card-footer">
+                            
+                        </div>
                     </div>
                 </div>
+                <div class="width-30">
+                    <div class="filtre">
+                        <form id="interetFiltre">
+                            <input type="date" name="debut" id="debut">
+                            <input type="date" name="fin" id="fin">
+                            <input type="submit" value="Filtrer">
+                        </form>
+                    </div>
+                </div>
+               
+            </div>
+            <div class="full table" id="tableInteret">
+                <div class="full search">
+                        <div class="title">
+                            <span>Interet par mois</span>
+                        </div>
+                        
+                        
+                </div> 
+                <div class="full table-content">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Nom</th>
+                                    <th>Prenom</th>
+                                    <th>Contact</th>
+                                    <th>Email</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                
+                                <tr>
+                                    <td>ANDRIANKIRIJA</td>
+                                    <td>Aro Irintsoa</td>
+                                    <td>0320410696</td>
+                                    <td><center>18</center></td>
+                                    
+                                </tr>
+                               
+                                
+                                
+                            </tbody>
+                        </table>
+                </div>
+                <div class="table-footer">
+                        <!-- <a href="#"><img src="assets/images/arrow_back_ios_100dp_FFFFFF_FILL0_wght400_GRAD0_opsz48.png" alt=""></a>
+                        <a href="#">1</a>
+                        <a href="#">...</a>
+                        <a href="#">3</a>
+                        <a href="#"><img src="assets/images/arrow_forward_ios_100dp_FFFFFF_FILL0_wght400_GRAD0_opsz48.png" alt=""></a> -->
+                </div>  
+                
             </div>
         
         </div>
     </div>
     <script src="assets/js/admin_index.js"></script>
-    <script src="assets/js/formes.js"></script>
+    <!-- <script src="assets/js/formes.js"></script> -->
+    <script src="assets/js/ajax.js"></script>
     <script>
-        window.onload = function(){
-            createCourbe('myChart','Vente',10000,[2000, 4000, 6000, 3000, 7000,2000,4000,8000,7000], ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun','Jul','AUG','SET']);
+        let chartInstance = null;
+
+    // Initialisation au chargement
+    window.addEventListener('DOMContentLoaded', () => {
+        const dat = {
+            debut: "2023-01-01", 
+            fin: "2023-12-30"
+        };
+        
+        const queryString = new URLSearchParams(dat).toString();
+        
+        ajax('GET', `/interetsParMois?${queryString}`, null, (response) => {
+            if (response?.success && response?.data?.length) {
+                const mois = response.data.map(item => item.Mois);
+                const interets = response.data.map(item => parseFloat(item.Interet));
+                
+                // Création de la table des intérêts par mois
+                const tableContent = document.querySelector('#tableInteret .table-content tbody');
+                tableContent.innerHTML = ''; // Vider le contenu existant
+                
+                // Mise à jour des en-têtes de colonne
+                const tableHeader = document.querySelector('#tableInteret thead tr');
+                tableHeader.innerHTML = `
+                    <th>Mois</th>
+                    <th>Intérêts</th>
+                `;
+                
+                // Remplissage des données
+                response.data.forEach((item, index) => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${mois[index]}</td>
+                        <td>${interets[index].toFixed(2)}</td>
+                    `;
+                    tableContent.appendChild(row);
+                });
+                
+                // Création de la courbe après la table
+                createCourbe('myChart', 'Ventes', 1000, interets, mois);
+            } else {
+                console.error("Données manquantes", response);
+                
+                // Afficher un message dans la table
+                const tableContent = document.querySelector('#tableInteret .table-content tbody');
+                tableContent.innerHTML = '<tr><td colspan="2" style="text-align: center;">Aucune donnée disponible</td></tr>';
+                
+                // Créer un graphique vide
+                createCourbe('myChart', 'Ventes', 1000, [], []);
+            }
+        }, (error) => {
+            console.error("Erreur:", error);
+            
+            // Afficher une erreur dans la table
+            const tableContent = document.querySelector('#tableInteret .table-content tbody');
+            tableContent.innerHTML = '<tr><td colspan="2" style="text-align: center;">Erreur de chargement des données</td></tr>';
+            
+            // Créer un graphique d'erreur
+            createCourbe('myChart', 'Erreur', 1000, [], []);
+        });
+    });
+
+        document.getElementById("interetFiltre").addEventListener("submit", function(event) {
+    event.preventDefault();
+    
+    // 1. Récupération propre des données du formulaire
+    const formData = new FormData(this);
+    const params = {
+        debut: formData.get('debut'), 
+        fin: formData.get('fin')
+    };
+
+    // 2. Validation des dates
+    if (!params.debut || !params.fin) {
+        alert("Veuillez sélectionner une période valide");
+        return;
+    }
+
+    // 3. Construction de l'URL
+    const queryString = new URLSearchParams(params).toString();
+
+    // 4. Appel AJAX
+    ajax('GET', `/interetsParMois?${queryString}`, null, (data) => {
+        if (data?.success && data?.data) {
+            // Transformation des données
+            const mois = data.data.map(item => item.Mois);
+            const interets = data.data.map(item => parseFloat(item.Interet) || 0);
+            
+            // Création du tableau avant la courbe
+            const tableContainer = document.getElementById('tableInteret');
+            
+            // Mise à jour du titre
+            tableContainer.querySelector('.title span').textContent = "Intérêts par mois";
+            
+            // Mise à jour des en-têtes
+            const thead = tableContainer.querySelector('thead tr');
+            thead.innerHTML = `
+                <th>Mois</th>
+                <th>Montant des intérêts</th>
+            `;
+            
+            // Remplissage des données
+            const tbody = tableContainer.querySelector('tbody');
+            tbody.innerHTML = ''; // Vider le contenu existant
+            
+            data.data.forEach((item, index) => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${mois[index]}</td>
+                    <td>${interets[index].toLocaleString('fr-FR', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
+                `;
+                tbody.appendChild(row);
+            });
+            
+            // Création de la courbe après le tableau
+            createCourbe('myChart', 'Vente', 1000, interets, mois);
+        } else {
+            const errorMsg = data?.message || "Format de réponse inattendu";
+            
+            // Afficher l'erreur dans le tableau
+            const tbody = document.querySelector('#tableInteret tbody');
+            tbody.innerHTML = `<tr><td colspan="2" style="text-align: center;">${errorMsg}</td></tr>`;
+            
+            alert(`Erreur: ${errorMsg}\n${JSON.stringify(data, null, 2)}`);
         }
+    }, (error) => {
+        console.error("Erreur:", error);
+        
+        // Afficher l'erreur dans le tableau
+        const tbody = document.querySelector('#tableInteret tbody');
+        tbody.innerHTML = `<tr><td colspan="2" style="text-align: center;">Erreur de chargement: ${error.statusText || error.message}</td></tr>`;
+        
+        alert(`Échec de la requête: ${error.statusText || error.message}`);
+    });
+});
+        function createCourbe(id, titre, max, data, labels) {
+            const canvas = document.getElementById(id);
+            if (!canvas) {
+                console.error("Canvas non trouvé:", id);
+                return;
+            }
+
+            // Détruire l'ancien graphique
+            if (chartInstance) {
+                chartInstance.destroy();
+            }
+
+            // Créer le nouveau graphique
+            const ctx = canvas.getContext('2d');
+            chartInstance = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: titre,
+                        data: data,
+                        fill: true,
+                        borderColor: '#3AB7D9',
+                        backgroundColor: 'rgba(58, 183, 217, 0.2)',
+                        tension: 0.4,
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            suggestedMax: max,
+                            grid: {
+                                color: 'rgba(0, 0, 0, 0.1)'
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false
+                            }
+                        }
+                    },
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'top'
+                        }
+                    }
+                }
+            });
+        }
+        
     </script>
 </body>
 </html>

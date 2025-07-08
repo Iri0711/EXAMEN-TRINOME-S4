@@ -52,7 +52,7 @@
              <div class="full table">
                 <div class="full search">
                         <div class="title">
-                            <span>Listes des materiaux</span>
+                            <span>Listes des utilisateurs</span>
                         </div>
                         <div class="input">
                             <a onclick="myModal()" class="validate">Ajouter</a>
@@ -75,32 +75,14 @@
                             </thead>
                             <tbody>
                                 
-                                <tr>
-                                    <td>ANDRIANKIRIJA</td>
-                                    <td>Aro Irintsoa</td>
-                                    <td>0320410696</td>
-                                    <td><center>18</center></td>
-                                    
-                                    <td>
-                                        <a href="#" class="validate">Valider</a>
-                                        <a href="#" class="modify">Modifier</a>
-                                        <a href="#" class="delete">Supprimer</a>
-                                        <a href="#" class="cancel">Annuler</a>
-                                    </td>
-                                </tr>
-                               
+
                                 
                                 
                             </tbody>
                         </table>
                 </div>
                 <div class="table-footer">
-                        <a href="#"><img src="assets/images/arrow_back_ios_100dp_FFFFFF_FILL0_wght400_GRAD0_opsz48.png" alt=""></a>
-                        <a href="#">1</a>
-                        <a href="#">...</a>
-                        <a href="#">3</a>
-                        <a href="#"><img src="assets/images/arrow_forward_ios_100dp_FFFFFF_FILL0_wght400_GRAD0_opsz48.png" alt=""></a>
-                </div>
+                       
                 </div>
                 <div class="form" id="form">
                     <a onclick="fermer()" class="close"><img src="assets/images/close_100dp_000000_FILL0_wght400_GRAD0_opsz48.png" alt="" srcset=""></a>
@@ -155,74 +137,195 @@
         
         </div>
     </div>
-    <script>
-        // Fonctions pour la navigation entre sections
-        function nextSection() {
-            document.getElementById('section-identite').style.display = 'none';
-            document.getElementById('section-auth').style.display = 'flex';
-            document.querySelector('.btn-prev').style.display = 'inline-block';
-            document.querySelector('.btn-next').style.display = 'none';
-            document.querySelector('.btn-submit').style.display = 'inline-block';
-        }
-
-        function prevSection() {
-            document.getElementById('section-identite').style.display = 'flex';
-            document.getElementById('section-auth').style.display = 'none';
-            document.querySelector('.btn-prev').style.display = 'none';
-            document.querySelector('.btn-next').style.display = 'inline-block';
-            document.querySelector('.btn-submit').style.display = 'none';
-        }
-
-        function submitForm() {
-            // Validation des champs
-            const nom = document.getElementById('nom').value;
-            const prenom = document.getElementById('prenom').value;
-            const email = document.getElementById('email').value;
-            const mdp = document.getElementById('mdp').value;
-            const confirmMdp = document.getElementById('confirm_mdp').value;
-            
-            if (!nom || !prenom) {
-                alert('Veuillez remplir tous les champs obligatoires de la section Identité');
-                prevSection();
-                return;
-            }
-            
-            if (!email || !mdp || !confirmMdp) {
-                alert('Veuillez remplir tous les champs obligatoires de la section Authentification');
-                return;
-            }
-            
-            if (mdp !== confirmMdp) {
-                alert('Les mots de passe ne correspondent pas');
-                return;
-            }
-            
-            // Ici vous pouvez ajouter le code pour soumettre le formulaire
-            alert('Formulaire soumis avec succès!');
-            fermer();
-            
-            // Réinitialiser le formulaire
-            document.querySelector('form').reset();
-        }
-
-        function myModal(){
-            var form=document.getElementById("form");
-            form.style.display="flex";
-            // Réinitialiser l'affichage des sections
-            document.getElementById('section-identite').style.display = 'flex';
-            document.getElementById('section-auth').style.display = 'none';
-            document.querySelector('.btn-prev').style.display = 'none';
-            document.querySelector('.btn-next').style.display = 'inline-block';
-            document.querySelector('.btn-submit').style.display = 'none';
-        };
-        
-        function fermer(){
-            var form=document.getElementById("form");
-            form.style.display="none";
-        };
-    </script>
     <script src="assets/js/admin_index.js"></script>
     <script src="assets/js/formes.js"></script>
+    <script src="assets/js/ajax.js"></script><script>
+    // Fonctions pour la navigation entre sections
+    var id = -1;
+    
+    window.addEventListener('DOMContentLoaded', () => {
+        loadUsersData();
+    });
+
+    // Fonction pour charger les données des utilisateurs et créer la table
+    function loadUsersData() {
+        ajax('GET', `/users`, null, (response) => {
+            if (response?.success && response?.data?.length) {
+                createUsersTable(response.data);
+                setupActionButtons();
+            } else {
+                console.error("Données manquantes", response);
+                displayTableMessage('Aucun utilisateur trouvé');
+            }
+        }, (error) => {
+            console.error("Erreur:", error);
+            displayTableMessage('Erreur de chargement des données');
+        });
+    }
+
+    // Fonction pour créer la table des utilisateurs
+    function createUsersTable(usersData) {
+        // Mise à jour du titre
+        document.querySelector('.full.table .title span').textContent = "Liste des utilisateurs";
+        
+        // Remplissage des données
+        const tableContent = document.querySelector('.full.table-content tbody');
+        tableContent.innerHTML = ''; // Vider le contenu existant
+        
+        usersData.forEach((user) => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td style='display:none;'>${user.id || ''}</td>
+                <td>${user.nom || ''}</td>
+                <td>${user.prenom || ''}</td>
+                <td>${user.contact || ''}</td>
+                <td><center>${user.email || ''}</center></td>
+                <td>
+                    <a href="#" class="modify">Modifier</a>
+                    <a href="#" class="delete">Supprimer</a>
+                </td>
+            `;
+            tableContent.appendChild(row);
+        });
+    }
+
+    // Fonction pour afficher un message dans la table
+    function displayTableMessage(message) {
+        const tableContent = document.querySelector('.full.table-content tbody');
+        tableContent.innerHTML = `<tr><td colspan="5" style="text-align: center;">${message}</td></tr>`;
+    }
+
+    // Fonction pour gérer les actions des boutons
+    function setupActionButtons() {
+        document.querySelectorAll('.modify').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.preventDefault();
+                const row = e.target.closest('tr');
+                fillFormWithUserData(row);
+                myModal();
+            });
+        });
+        
+        document.querySelectorAll('.delete').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.preventDefault();
+                if(confirm("Voulez-vous vraiment supprimer cet utilisateur ?")) {
+                    const userId = e.target.closest('tr').cells[0].textContent;
+                    deleteUser(userId);
+                }
+            });
+        });
+    }
+
+    // Fonction pour remplir le formulaire avec les données utilisateur
+    function fillFormWithUserData(row) {
+        id = row.cells[0].textContent;
+        document.getElementById('nom').value = row.cells[1].textContent;
+        document.getElementById('prenom').value = row.cells[2].textContent;
+        document.getElementById('contact').value = row.cells[3].textContent;
+        document.getElementById('email').value = row.cells[4].textContent.trim();
+        
+        // Cacher les sections non nécessaires pour la modification
+        document.getElementById('section-auth').style.display = 'none';
+        document.querySelector('.btn-next').style.display = 'none';
+        document.querySelector('.btn-submit').style.display = 'block';
+    }
+
+    // Fonction pour supprimer un utilisateur
+    function deleteUser(userId) {
+        ajax('DELETE', `/users/${userId}`, null, (response) => {
+            if(response.success) {
+                alert("Utilisateur supprimé avec succès");
+                loadUsersData(); // Recharger les données au lieu de recharger toute la page
+            } else {
+                alert("Erreur lors de la suppression");
+            }
+        });
+    }
+
+    function nextSection() {
+        document.getElementById('section-identite').style.display = 'none';
+        document.getElementById('section-auth').style.display = 'flex';
+        document.querySelector('.btn-prev').style.display = 'inline-block';
+        document.querySelector('.btn-next').style.display = 'none';
+        document.querySelector('.btn-submit').style.display = 'inline-block';
+    }
+
+    function prevSection() {
+        document.getElementById('section-identite').style.display = 'flex';
+        document.getElementById('section-auth').style.display = 'none';
+        document.querySelector('.btn-prev').style.display = 'none';
+        document.querySelector('.btn-next').style.display = 'inline-block';
+        document.querySelector('.btn-submit').style.display = 'none';
+    }
+
+    function submitForm() {
+        // Validation des champs
+        const nom = document.getElementById('nom').value;
+        const prenom = document.getElementById('prenom').value;
+        const contact = document.getElementById('contact').value;
+        const email = document.getElementById('email').value;
+        const mdp = document.getElementById('mdp').value;
+        const confirmMdp = document.getElementById('confirm_mdp').value;
+        
+        if (!nom || !prenom) {
+            alert('Veuillez remplir tous les champs obligatoires de la section Identité');
+            prevSection();
+            return;
+        }
+        
+        if (!email || !mdp || !confirmMdp) {
+            alert('Veuillez remplir tous les champs obligatoires de la section Authentification');
+            return;
+        }
+        
+        if (mdp !== confirmMdp) {
+            alert('Les mots de passe ne correspondent pas');
+            return;
+        }
+
+        if(id == -1) {
+            ajax('POST', `/users`, {nom:nom, prenom:prenom, contact:contact, email:email, mdp:mdp}, (response) => {
+                if (response?.success) {
+                    alert(response?.message);
+                    loadUsersData(); // Recharger les données après ajout
+                } else {
+                    alert("Erreur lors de l'ajout");
+                }
+            });
+        } else {
+            ajax('PUT', `/users/${id}`, {nom:nom, prenom:prenom, contact:contact, email:email, mdp:mdp}, (response) => {
+                if (response?.success) {
+                    alert(response?.message);
+                    loadUsersData(); // Recharger les données après modification
+                } else {
+                    alert("Erreur lors de la modification");
+                }
+            });
+        }
+        
+        fermer();
+        id = -1;
+        document.querySelector('form').reset();
+    }
+
+    function myModal() {
+        var form = document.getElementById("form");
+        form.style.display = "flex";
+        // Réinitialiser l'affichage des sections
+        document.getElementById('section-identite').style.display = 'flex';
+        document.getElementById('section-auth').style.display = 'none';
+        document.querySelector('.btn-prev').style.display = 'none';
+        document.querySelector('.btn-next').style.display = 'inline-block';
+        document.querySelector('.btn-submit').style.display = 'none';
+    };
+    
+    function fermer() {
+        var form = document.getElementById("form");
+        form.style.display = "none";
+    };
+</script>
+    
 
 </body>
 </html>

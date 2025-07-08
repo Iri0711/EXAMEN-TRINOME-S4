@@ -57,6 +57,12 @@ Table Pret_Type{
     taux decimal
     duree integer
 }
+Table Pret_Assurance{
+    id integer
+    id_client_pret integer
+    montant decimal
+    description text
+}
 Table Pret_Client{
     id integer
     id_client integer
@@ -64,6 +70,7 @@ Table Pret_Client{
     id_pret_type integer
     montant decimal
     date date
+    duree integer
 }
 Ref: Employe.id_user > User.id
 Ref: Employe.id_dept > Departement.id
@@ -74,3 +81,4 @@ Ref: Pret_Client.id_client > Client.id
 Ref: Pret_Client.id_etab > Etablissement.id
 Ref: Pret_Client.id_pret_type > Pret_Type.id
 Ref:Pret_Retour.id_client_pret > Pret_Client.id
+Ref: Pret_Assurance.id_client_pret > Pret_Client.id
