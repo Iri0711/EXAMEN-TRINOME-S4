@@ -130,13 +130,14 @@
         }
 
         function validerFonds(id,daty) {
+            alert('VOULEZ VOUS VALIDER CE FOND ?')
             console.log("Validation du fonds avec ID:", id);
             ajax('POST', '/fondValidation', { id_etab_fond: id , date:daty }, (response) => {
                 console.log("Fonds validé:", response);
                 loadFunds();
                 loadValidFunds();
             });
-        }
+        } 
 
         document.querySelector('form').addEventListener('submit', function(event) {
             event.preventDefault();

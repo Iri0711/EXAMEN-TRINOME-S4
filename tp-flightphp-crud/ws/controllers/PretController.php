@@ -61,4 +61,15 @@ class PretController {
         Flight::json(['message' => 'Retour de prêt ajouté', 'id' => $id]);
     }
 
+
+    // REMAINING PAYEMENTS
+
+     public static function getRemainingBalances() {
+        $result = Retour::getRemainingBalances();
+        if (isset($result['success']) && !$result['success']) {
+            Flight::json(['error' => $result['error']], 500);
+        } else {
+            Flight::json($result);
+        }
+    }
 }

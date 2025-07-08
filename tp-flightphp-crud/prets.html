@@ -67,6 +67,22 @@
             </thead>
             <tbody></tbody>
         </table>
+
+        <h2>Reste à payer par client</h2>
+    <table id="reste-payer-table">
+        <thead>
+            <tr>
+                <th>ID Client</th>
+                <th>Nom</th>
+                <th>Prénom</th>
+                <th>Solde Restant Total</th>
+                <th>Détails des Prêts</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Les données seront insérées ici par JavaScript -->
+        </tbody>
+    </table>
     </div>
     <script>
 
@@ -152,6 +168,7 @@
             const montantPret = document.querySelector('#pret-form input[name="montant"]').value;
             const datePret = document.querySelector('#pret-form input[name="date_pret"]').value;
 
+            alert('VOULEZ VOUS VRAIMENT FAIRE CE PRET ?');
             ajax('POST', '/create_pret', { id_client: clientId, id_pret_type: typePret, montant: montantPret, date: datePret }, (response) => {
                 if (response.success) {
                     alert('Prêt ajouté avec succès');
@@ -166,6 +183,7 @@
         function returnBook(pretId) {
             const dateRetour = prompt("Entrez la date de retour (YYYY-MM-DD):");
             const montantRetour = prompt("Entrez le montant du retour:");
+            alert('VOULEZ VOUS VRAIMENT FAIRE CE RETOUR ?');
             ajax('POST', '/retourPret', { id_client_pret: pretId, montant: montantRetour, date: dateRetour }, (response) => {
                 if (response.success) {
                     alert('Prêt retourné avec succès');
@@ -194,7 +212,42 @@
             });
         }
 
+        function loadRemainingBalances() {
+            ajax('GET', '/pretClient/remainingBalances', null, (data) => {
+                const tbody = document.getElementById('reste-payer-table').querySelector('tbody');
+                tbody.innerHTML = '';
+                if (data.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="5">Aucun client avec des prêts trouvé.</td></tr>';
+                    return;
+                }
+                data.forEach(client => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${client.client_id}</td>
+                        <td>${client.nom}</td>
+                        <td>${client.prenom}</td>
+                        <td>${client.montant_restant_total.toFixed(2)}</td>
+                        <td>
+                            <ul>
+                                ${client.prets.map(pret => `
+                                    <li>
+                                        Prêt ID: ${pret.pret_id}, 
+                                        Montant initial: ${pret.montant_pret.toFixed(2)}, 
+                                        Taux: ${pret.taux_interet}%, 
+                                        Durée: ${pret.duree_jours} jours, 
+                                        Remboursé: ${pret.montant_rembourse.toFixed(2)}, 
+                                        Restant: ${pret.montant_restant.toFixed(2)}
+                                    </li>
+                                `).join('')}
+                            </ul>
+                        </td>
+                    `;
+                    tbody.appendChild(row);
+                });
+            });
+        }
 
+        loadRemainingBalances();
         loadRetours();
         loadPrets();
         loadTypePrets();
