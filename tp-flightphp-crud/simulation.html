@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Simulation de Prêts</title>
+    <link rel="stylesheet" href="assets/css/general.css">
+    <link rel="stylesheet" href="assets/css/index.css">
+    <link rel="stylesheet" href="assets/css/formes.css">
+    <link rel="stylesheet" href="assets/css/tables.css">
+    <link rel="stylesheet" href="assets/css/simulation.css">
+</head>
+<body>
+    <div class="main-container">
+        <div class="menu">
+            <div class="logo"><img src="assets/images/Flux_Dev_A_modern_highcontrast_transparent_background_logo_des_2-removebg-preview.png" alt="Logo Banque"></div>
+            <nav>
+                <ul>
+                    <li>
+                        <button class="dropdown-btn">Dashboard</button>
+                        <ul class="dropdown-content">
+                            <li><a href="index.html">Interets</a></li>
+                        </ul>
+                    </li>
+                    <li>
+                        <button class="dropdown-btn">Finance</button>
+                        <ul class="dropdown-content">
+                            <li><a href="demandes.html">Fonds</a></li>
+                            <li><a href="demandes.html">Prets</a></li>
+                        </ul>
+                    </li>
+                    <li>
+                        <button class="dropdown-btn">Crud</button>
+                        <ul class="dropdown-content">
+                            <li><a href="users.html">User</a></li>
+                            <li><a href="departements.html">Departement</a></li>
+                            <li><a href="typeprets.html">Type de pret</a></li>
+                            <li><a href="clients.html">Client</a></li>
+                            <li><a href="employes.html">Employe</a></li>
+                        </ul>
+                    </li>
+                    <li>
+                        <button class="dropdown-btn">Autre fonctions</button>
+                        <ul class="dropdown-content">
+                            <li><a href="simulation.html">Simulation</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+        <div class="content">
+            <div class="full">
+                <div class="full">
+                    <div class="card">
+                        <div class="card-header">
+                            Simulation de Prêts
+                        </div>
+                        <div class="card-content">
+                            <form id="simulationForm">
+                                <div class="form-group">
+                                    <label for="montantEF">Montant du Fonds de l'EF :</label>
+                                    <input type="number" id="montantEF" name="montantEF" min="0" step="0.01" required>
+                                </div>
+                                <div class="form-group">
+                                    <h3>Ajouter un Prêt</h3>
+                                    <label for="montantPret">Montant du Prêt :</label>
+                                    <input type="number" id="montantPret" name="montantPret" min="0" step="0.01" required>
+                                    <label for="tauxPret">Taux d'Intérêt Annuel (%) :</label>
+                                    <input type="number" id="tauxPret" name="tauxPret" min="0" step="0.01" required>
+                                    <label for="dureePret">Durée du Prêt (jours) :</label>
+                                    <input type="number" id="dureePret" name="dureePret" min="1" required>
+                                    <label for="debutPret">Date de Début :</label>
+                                    <input type="date" id="debutPret" name="debutPret" required>
+                                    <label for="descriptionPret">Description :</label>
+                                    <input type="text" id="descriptionPret" name="descriptionPret" required>
+                                    <button type="button" id="addPret" class="validate">Ajouter Prêt</button>
+                                    <button type="button" id="resetPrets" class="cancel">Réinitialiser</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="full">
+                <div class="full table" id="tablePrets">
+                    <div class="full search">
+                        <div class="title">
+                            <span>Liste des Prêts</span>
+                        </div>
+                    </div>
+                    <div class="full table-content">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Montant</th>
+                                    <th>Taux (%)</th>
+                                    <th>Durée (jours)</th>
+                                    <th>Date Début</th>
+                                    <th>Description</th>
+                                </tr>
+                            </thead>
+                            <tbody id="pretsBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="full">
+                <div>
+                    <div class="filtre">
+                        <form id="comparaisonForm">
+                            <h3>Comparer les Prêts</h3>
+                            <label for="pret1">Prêt 1 :</label>
+                            <select id="pret1" name="pret1" required></select>
+                            <label for="pret2">Prêt 2 :</label>
+                            <select id="pret2" name="pret2" required></select>
+                            <button type="submit">Comparer</button>
+                        </form>
+                    </div>
+                    <div class="full table" id="tableComparaison">
+                        <div class="full">
+                            <div class="title">
+                                <span>Comparaison des Prêts</span>
+                            </div>
+                        </div>
+                        <div class="table-content">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Critère</th>
+                                        <th>Prêt 1</th>
+                                        <th>Prêt 2</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="comparaisonBody"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        // Load data from localStorage or initialize empty
+        let simulationData = JSON.parse(localStorage.getItem('simulationData')) || {
+            montantEF: 0,
+            prets: []
+        };
+
+        // Update table and dropdowns
+        function updateUI(filteredPrets = simulationData.prets) {
+            const pretsBody = document.getElementById('pretsBody');
+            pretsBody.innerHTML = '';
+            filteredPrets.forEach(pret => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${pret.montant.toLocaleString('fr-FR', { minimumFractionDigits: 2 })}</td>
+                    <td>${pret.taux.toFixed(2)}</td>
+                    <td>${pret.duree}</td>
+                    <td>${pret.debut}</td>
+                    <td>${pret.description}</td>
+                `;
+                pretsBody.appendChild(row);
+            });
+
+            const pret1Select = document.getElementById('pret1');
+            const pret2Select = document.getElementById('pret2');
+            pret1Select.innerHTML = '<option value="">Sélectionner un prêt</option>';
+            pret2Select.innerHTML = '<option value="">Sélectionner un prêt</option>';
+            filteredPrets.forEach((pret, index) => {
+                const option = `<option value="${index}">${pret.description} (${pret.debut})</option>`;
+                pret1Select.innerHTML += option;
+                pret2Select.innerHTML += option;
+            });
+
+            // Update EF amount input
+            document.getElementById('montantEF').value = simulationData.montantEF || '';
+        }
+
+        // Add loan
+        document.getElementById('addPret').addEventListener('click', () => {
+            const montant = parseFloat(document.getElementById('montantPret').value);
+            const taux = parseFloat(document.getElementById('tauxPret').value);
+            const duree = parseInt(document.getElementById('dureePret').value);
+            const debut = document.getElementById('debutPret').value;
+            const description = document.getElementById('descriptionPret').value;
+
+            if (montant && taux >= 0 && duree && debut && description) {
+                simulationData.prets.push({ montant, taux, duree, debut, description });
+                localStorage.setItem('simulationData', JSON.stringify(simulationData));
+                updateUI();
+                document.getElementById('montantPret').value = '';
+                document.getElementById('tauxPret').value = '';
+                document.getElementById('dureePret').value = '';
+                document.getElementById('debutPret').value = '';
+                document.getElementById('descriptionPret').value = '';
+            } else {
+                alert('Veuillez remplir tous les champs correctement.');
+            }
+        });
+
+        // Reset loans and EF amount
+        document.getElementById('resetPrets').addEventListener('click', () => {
+            if (confirm('Voulez-vous vraiment réinitialiser tous les prêts et le montant du fonds EF ?')) {
+                simulationData = { montantEF: 0, prets: [] };
+                localStorage.setItem('simulationData', JSON.stringify(simulationData));
+                document.getElementById('montantEF').value = '';
+                document.getElementById('montantPret').value = '';
+                document.getElementById('tauxPret').value = '';
+                document.getElementById('dureePret').value = '';
+                document.getElementById('debutPret').value = '';
+                document.getElementById('descriptionPret').value = '';
+                document.getElementById('comparaisonBody').innerHTML = '';
+                updateUI();
+            }
+        });
+
+        // Update EF amount
+        document.getElementById('montantEF').addEventListener('change', () => {
+            simulationData.montantEF = parseFloat(document.getElementById('montantEF').value) || 0;
+            localStorage.setItem('simulationData', JSON.stringify(simulationData));
+        });
+
+        // Compare loans
+        document.getElementById('comparaisonForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const pret1Index = document.getElementById('pret1').value;
+            const pret2Index = document.getElementById('pret2').value;
+
+            // Use all loans since no date filtering in comparison
+            const filteredPrets = simulationData.prets;
+            updateUI(filteredPrets);
+
+            if (pret1Index === '' || pret2Index === '' || pret1Index === pret2Index) {
+                alert('Veuillez sélectionner deux prêts différents.');
+                return;
+            }
+
+            const pret1 = filteredPrets[pret1Index];
+            const pret2 = filteredPrets[pret2Index];
+            const montantEF = simulationData.montantEF;
+
+            // Calculate monthly interest repayment
+            const months1 = Math.ceil(pret1.duree / 30);
+            const months2 = Math.ceil(pret2.duree / 30);
+            const monthlyInterest1 = (pret1.montant * (pret1.taux / 100) / 12) * months1;
+            const monthlyInterest2 = (pret2.montant * (pret2.taux / 100) / 12) * months2;
+
+            // Calculate remaining EF funds: capital + interest repayments - loan amount
+            const resteEF1 = montantEF + monthlyInterest1 - pret1.montant;
+            const resteEF2 = montantEF + monthlyInterest2 - pret2.montant;
+
+            const comparaisonBody = document.getElementById('comparaisonBody');
+            comparaisonBody.innerHTML = `
+                <tr>
+                    <td>Montant</td>
+                    <td>${pret1.montant.toLocaleString('fr-FR', { minimumFractionDigits: 2 })}</td>
+                    <td>${pret2.montant.toLocaleString('fr-FR', { minimumFractionDigits: 2 })}</td>
+                </tr>
+                <tr>
+                    <td>Taux (%)</td>
+                    <td>${pret1.taux.toFixed(2)}</td>
+                    <td>${pret2.taux.toFixed(2)}</td>
+                </tr>
+                <tr>
+                    <td>Somme obtenue par l'EF (Intérêts Mensuels)</td>
+                    <td>${monthlyInterest1.toLocaleString('fr-FR', { minimumFractionDigits: 2 })}</td>
+                    <td>${monthlyInterest2.toLocaleString('fr-FR', { minimumFractionDigits: 2 })}</td>
+                </tr>
+                <tr>
+                    <td>Durée (jours)</td>
+                    <td>${pret1.duree}</td>
+                    <td>${pret2.duree}</td>
+                </tr>
+                <tr>
+                    <td>Date de Début</td>
+                    <td>${pret1.debut}</td>
+                    <td>${pret2.debut}</td>
+                </tr>
+                <tr>
+                    <td>Reste des fonds EF</td>
+                    <td>${resteEF1.toLocaleString('fr-FR', { minimumFractionDigits: 2 })}</td>
+                    <td>${resteEF2.toLocaleString('fr-FR', { minimumFractionDigits: 2 })}</td>
+                </tr>
+            `;
+        });
+
+        // Initialize UI
+        document.getElementById('montantEF').value = simulationData.montantEF || '';
+        updateUI();
+    </script>
+    <script src="assets/js/admin_index.js"></script>
+    <script src="assets/js/formes.js"></script>
+</body>
+</html>
