@@ -5,6 +5,10 @@ Flight::route('GET /clients', function() {
     ClientController::getAll();
 });
 
+Flight::route('GET /listclients', function() {
+    ClientController::getList();
+});
+
 Flight::route('GET /clients/@id', function($id) {
     ClientController::getById($id);
 });

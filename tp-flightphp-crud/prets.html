@@ -40,6 +40,13 @@
             <input type="date" id="date_pret" name="date_pret" required>
             <button type="submit">Enregistrer</button>
         </form>
+
+        <h2>Listes des clients</h2>
+        <ul>
+            <!-- Les clients seront insérés ici par JavaScript -->
+            <li><a href="client_details.html">Voir les détails des clients</a></li>
+        </ul>
+
         <h2>Liste des Prêts</h2>
         <table id="pret-table">
             <thead>
@@ -247,11 +254,24 @@
             });
         }
 
+        function listClients(){
+            ajax('GET', '/listclients', {}, (response) => {
+                const clientList = document.querySelector('ul');
+                clientList.innerHTML = '';
+                response.forEach(client => {
+                    const li = document.createElement('li');
+                    li.innerHTML = `<a href="client_details.php?clientId=${client.cid}">${client.nom} ${client.prenom}</a>`;
+                    clientList.appendChild(li);
+                });
+            });
+        }
+
         loadRemainingBalances();
         loadRetours();
         loadPrets();
         loadTypePrets();
         loadClients();
+        listClients();
 
     </script>
 </body>

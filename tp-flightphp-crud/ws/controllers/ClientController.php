@@ -20,6 +20,11 @@ class ClientController {
         Flight::json(['message' => 'Client ajouté', 'id' => $id]);
     }
 
+    public static function getList() {
+        $clients = Client::getAll();
+        Flight::json($clients);
+    }
+
     // public static function update($id) {
     //     $data = Flight::request()->data;
     //     Client::update($id, $data);
