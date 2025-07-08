@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Gestion des Départements</title>
+    <link rel="stylesheet" href="assets/css/general.css">
+    <link rel="stylesheet" href="assets/css/index.css">
+    <link rel="stylesheet" href="assets/css/formes.css">
+    <link rel="stylesheet" href="assets/css/carte.css">
+    <link rel="stylesheet" href="assets/css/tables.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="main-container">
+        <div class="menu">
+            <div class="logo"><img src="assets/images/Flux_Dev_A_modern_highcontrast_transparent_background_logo_des_2-removebg-preview.png" alt="Logo Banque"></div>
+            <nav>
+                <ul>
+                    <li>
+                        <button class="dropdown-btn">Dashboard</button>
+                        <ul class="dropdown-content">
+                            <li><a href="index.html">Interets</a></li>
+                        </ul>
+                    </li>
+                    <li>
+                        <button class="dropdown-btn">Finance</button>
+                        <ul class="dropdown-content">
+                              <li><a href="fond.html">Fonds</a></li>
+                            <li><a href="prets.html">Prets</a></li>
+                            
+                        </ul>
+                    </li>
+                    <li>
+                        <button class="dropdown-btn">Crud</button>
+                        <ul class="dropdown-content">
+                            <li><a href="users.html">User</a></li>
+                            <li><a href="departements.html">Département</a></li>
+                            <li><a href="typeprets.html">Type de pret</a></li>
+                            <li><a href="clients.html">Client</a></li>
+                            <li><a href="employes.html">Employe</a></li>
+                        </ul>
+                    </li>
+                    <li>
+                        <button class="dropdown-btn">Autre fonctions</button>
+                        <ul class="dropdown-content">
+                            <li><a href="simulation.html">Simulation</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+        <div class="content">
+            <div class="full table">
+                <div class="full search">
+                    <div class="title">
+                        <span>Liste des départements</span>
+                    </div>
+                    <div class="input">
+                        <a onclick="myModal()" class="validate">Ajouter</a>
+                    </div>
+                </div> 
+                <div class="full table-content">
+                    <table id="funds-list">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Id etablissement</th>
+                                <th>Montant</th>
+                                <th>Date</th>
+                                <th>Libelle</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Les données seront chargées ici par JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+                <div class="table-footer"></div>
+               
+            </div>
+            <div class="full table">
+                <div class="full search">
+                    <div class="title">
+                        <span>Liste des départements</span>
+                    </div>
+                </div> 
+                <div class="full table-content">
+                    <table id="valid-funds-list">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Id fond</th>
+                                <th>Montant</th>
+                                <th>Status</th>
+                                <th>Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Les données seront chargées ici par JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+                <div class="table-footer"></div>
+               
+            </div>
+        </div>
+    </div>
+     
+    <div class="form" id="form">
+        <a onclick="fermer()" class="close"><img src="assets/images/close_100dp_000000_FILL0_wght400_GRAD0_opsz48.png" alt="Fermer"></a>
+        <div class="formulaire">
+            <div class="formulaire-header" id="form-title">
+                Formulaire d'ajout de fond
+            </div>
+            <div class="formulaire-content">
+                <div class="element">
+                    <input type="number" id="fund-id-etab" name="id_etab" value="1" required hidden>
+                </div>
+                <div class="element">
+                            
+                    <input type="number" id="fund-montant" name="montant" step="0.01" placeholder=" " required>
+                    <label for="fund-montant">Montant</label>
+                </div>
+                <div class="element">
+                            
+                            <input type="date" id="fund-date" name="date" required>
+                            <label for="fund-date">Date:</label>
+                </div>
+                <div class="element">
+                            
+                        
+                        <input type="text" id="fund-name" name="libelle" placeholder=" " required>
+                        <label for="fund-name">Libelle</label>
+                </div>
+            </div>
+            <div class="formulaire-footer">
+                <button type="button" class="btn-submit validate" onclick="submitForm()">Valider</button>
+            </div>
+        </div>
+    </div>
+    <script src="assets/js/ajax.js"></script>
+    <script>
+            loadFunds();
+            loadValidFunds();
+         function loadFunds() {
+   
+            ajax('GET', '/etablissementFonds', null, (data) => {
+    
+                const fundsList = document.querySelector('#funds-list tbody');
+                fundsList.innerHTML = '';
+                if (data.length === 0) {
+                    
+                    return;
+                }
+                data.forEach(fund => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td>${fund.id}</td>
+                        <td>${fund.id_etab}</td>
+                        <td>${fund.montant}</td>
+                        <td>${fund.date}</td>
+                        <td>${fund.libelle}</td>
+                        <td>En cours</td>
+                        <td><a onclick="validerFonds(${fund.id}, '${fund.date}')" class="validate">Valider</a></td>
+                    `;
+                    fundsList.appendChild(tr);
+                });
+            });
+        }
+
+        function loadValidFunds() {
+ 
+            ajax('GET', '/fondValidation', null, (data) => {
+             
+                const validFundsList = document.querySelector('#valid-funds-list tbody');
+                validFundsList.innerHTML = '';
+                if (data.length === 0) {
+                    validFundsList.textContent = 'Aucun fonds valide trouvé.';
+                    return;
+                }
+                data.forEach(fund => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td>${fund.id}</td>
+                        <td>${fund.id_etab_fond}</td>
+                        <td>${fund.montant}</td>
+                        <td>Valide</td>
+                        <td>${fund.date}</td>
+                    `;
+                    validFundsList.appendChild(tr);
+                });
+            });
+        }
+
+        function validerFonds(id,daty) {
+            alert('VOULEZ VOUS VALIDER CE FOND ?')
+            console.log("Validation du fonds avec ID:", id);
+            ajax('POST', '/fondValidation', { id_etab_fond: id , date:daty }, (response) => {
+                console.log("Fonds validé:", response);
+                loadFunds();
+                loadValidFunds();
+            });
+        } 
+
+        function submitForm(){
+            event.preventDefault();
+            const idEtab = document.getElementById('fund-id-etab').value;
+            const montant = document.getElementById('fund-montant').value;
+            const date = document.getElementById('fund-date').value;
+            const libelle = document.getElementById('fund-name').value;
+            ajax('POST', '/etablissementFonds', { id_etab: idEtab, montant, date, libelle }, (response) => {
+                console.log("Fonds ajouté:", response);
+                loadFunds();
+                this.reset();
+            });
+        };
+
+        loadFunds();
+        loadValidFunds();
+
+        // Fonction pour ouvrir le modal
+        function myModal() {
+            // Réinitialiser le formulaire
+            
+            
+            
+            var form = document.getElementById("form");
+           
+            form.style.display = "flex";
+        };
+        
+        // Fonction pour fermer le modal
+        function fermer() {
+            var form = document.getElementById("form");
+            form.style.display = "none";
+            currentDeptId = -1; // Réinitialiser l'ID
+        };
+    </script>
+    <script src="assets/js/admin_index.js"></script>
+    <script src="assets/js/formes.js"></script>
+</body>
+</html>
