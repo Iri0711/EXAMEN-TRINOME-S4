@@ -2,268 +2,158 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestion des Prêts</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background: #f2f2f2;
-            margin: 0;
-            padding: 0;
-        }
-        .container {
-            max-width: 1100px;
-            margin: auto;
-            padding: 20px;
-            background: white;
-        }
-        h1, h2 {
-            color: #0a4545;
-        }
-        form {
-            margin-bottom: 30px;
-            padding: 15px;
-            border: 1px solid #ccc;
-            background: #f9f9f9;
-        }
-        label {
-            display: block;
-            margin-top: 10px;
-            font-weight: bold;
-        }
-        input, select {
-            width: 100%;
-            padding: 8px;
-            margin-top: 5px;
-        }
-        button {
-            margin-top: 15px;
-            padding: 10px 15px;
-            background-color: #0a4545;
-            color: white;
-            border: none;
-            cursor: pointer;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 10px;
-        }
-        table th, table td {
-            padding: 8px;
-            border: 1px solid #ccc;
-            text-align: left;
-        }
-        table th {
-            background-color: #0a4545;
-            color: white;
-        }
-        .filter-container {
-            margin-bottom: 15px;
-        }
-        .filter-container input {
-            width: 300px;
-        }
-    </style>
+    <title>Gestion des fonds</title>
 </head>
 <body>
-    <div class="container">
-        <h1>Gestion des Prêts</h1>
-        <a href="index.html">Retour à l'accueil</a>
+    <h1>Gestion des fonds</h1>
 
-        <!-- Formulaire type de prêt -->
-        <h2>Ajouter un type de prêt</h2>
-        <form id="type-form">
-            <label>Libellé</label>
-            <input type="text" id="libelle" name="libelle" required>
-            <label>Taux</label>
-            <input type="number" id="taux" name="taux" step="0.01" required>
-            <label>Durée (jours)</label>
-            <input type="number" id="duree" name="duree" required>
-            <button type="submit">Ajouter</button>
-        </form>
+    <form action="">
+        <!-- <label for="fund-id-etab">ID Établissement:</label> -->
+        <input type="number" id="fund-id-etab" name="id_etab" value="1" required hidden>
+        <label for="fund-montant">Montant:</label>
+        <input type="number" id="fund-montant" name="montant" step="0.01" required>
+        <label for="fund-date">Date:</label>
+        <input type="date" id="fund-date" name="date" required>
+        <label for="fund-name">Libelle:</label>
+        <input type="text" id="fund-name" name="libelle" required>
+        <button type="submit">Ajouter</button>
+    </form>
 
-        <!-- Formulaire prêt -->
-        <h2>Ajouter un prêt</h2>
-        <form id="pret-form">
-            <label>ID Client</label>
-            <select name="client_id" id="client_id" required>
-                <option value="">Sélectionner un client</option>
-            </select>
-            <input type="hidden" id="etablissement_id" name="etablissement_id" value="1">
-            <label>Type de prêt</label>
-            <select id="type_pret" name="type_pret" required>
-                <option value="">Sélectionner un type de prêt</option>
-            </select>
-            <label>Montant</label>
-            <input type="number" id="montant" name="montant" required>
-            <label>Date de Prêt</label>
-            <input type="date" id="date_pret" name="date_pret" required>
-            <button type="submit">Enregistrer</button>
-        </form>
+    <h2>Liste des fonds</h2>
+    <table id="funds-list" border="1px">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Id etablissement</th>
+                <th>Montant</th>
+                <th>Date</th>
+                <th>Libelle</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Les données seront insérées ici par JavaScript -->
+        </tbody>
+    </table>
 
-        <!-- Liste des prêts avec filtre -->
-        <h2>Liste des Prêts</h2>
-        <div class="filter-container">
-            <label for="filter">Filtrer par ID Client ou Type de Prêt :</label>
-            <input type="text" id="filter" placeholder="Rechercher...">
-        </div>
-        <table id="pret-table">
-            <thead>
-                <tr>
-                    <th>ID prêt</th>
-                    <th>ID client</th>
-                    <th>Type de Prêt</th>
-                    <th>Montant</th>
-                    <th>Date de prêt</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody></tbody>
-        </table>
-
-        <!-- Liste des retours -->
-        <h2>Liste des Retours</h2>
-        <table id="retour-table">
-            <thead>
-                <tr>
-                    <th>ID retour</th>
-                    <th>ID prêt</th>
-                    <th>ID client</th>
-                    <th>Date de retour</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody></tbody>
-        </table>
-    </div>
-
+    <h2>Listes des fonds valides</h2>
+    <table id="valid-funds-list" border="1px">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Id fond</th>
+                <th>Montant</th>
+                <th>Status</th>
+                <th>Date</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Les données seront insérées ici par JavaScript -->
+        </tbody>
     <script>
-        const apiBase = "http://localhost/L2/S4/Mr_Rojo/EXAMEN-TRINOME-S4/tp-flightphp-crud/ws";
+       const apiBase = "http://localhost/L2/S4/Mr_Rojo/EXAMEN-TRINOME-S4/tp-flightphp-crud/ws";
 
         function ajax(method, url, data, callback) {
             const xhr = new XMLHttpRequest();
             xhr.open(method, apiBase + url, true);
             xhr.setRequestHeader("Content-Type", "application/json");
-            xhr.onload = function() {
-                if (xhr.status >= 200 && xhr.status < 300) {
-                    callback(JSON.parse(xhr.responseText));
-                } else {
-                    console.error('Erreur:', xhr.statusText);
+
+            xhr.onreadystatechange = () => {
+                if (xhr.readyState === 4) {
+                    if (xhr.status >= 200 && xhr.status < 300) {
+                        try {
+                            callback(JSON.parse(xhr.responseText));
+                        } catch (e) {
+                            console.error("Erreur de parsing JSON:", e);
+                            console.error("Réponse brute:", xhr.responseText);
+                        }
+                    } else {
+                        console.error(`Erreur HTTP ${xhr.status}: ${xhr.statusText}`);
+                        console.error("Réponse brute:", xhr.responseText);
+                    }
                 }
             };
-            xhr.send(JSON.stringify(data));
+
+            const sendData = data ? JSON.stringify(data) : null;
+            xhr.send(sendData);
         }
 
-        function loadTypePrets() {
-            ajax('GET', '/prets', {}, (response) => {
-                const pretSelect = document.querySelector('#type_pret');
-                pretSelect.innerHTML = '<option value="">Sélectionner un type de prêt</option>';
-                response.forEach(pret => {
-                    const option = document.createElement('option');
-                    option.value = pret.id;
-                    option.textContent = `ID: ${pret.id} - ${pret.libelle} (${pret.taux}% sur ${pret.duree}j)`;
-                    pretSelect.appendChild(option);
-                });
-            });
-        }
-
-        function loadClients() {
-            ajax('GET', '/clients', {}, (response) => {
-                const clientSelect = document.querySelector('#client_id');
-                clientSelect.innerHTML = '<option value="">Sélectionner un client</option>';
-                response.forEach(client => {
-                    const option = document.createElement('option');
-                    option.value = client.cid;
-                    option.textContent = `${client.cid} - ${client.nom} ${client.prenom}`;
-                    clientSelect.appendChild(option);
-                });
-            });
-        }
-
-        document.querySelector('#type-form').addEventListener('submit', function(event) {
-            event.preventDefault();
-            const libelle = document.querySelector('#libelle').value;
-            const taux = document.querySelector('#taux').value;
-            const duree = document.querySelector('#duree').value;
-
-            ajax('POST', '/type_pret', { libelle, taux, duree }, (response) => {
-                alert('Type de prêt ajouté avec succès');
-                loadTypePrets();
-            });
-        });
-
-        function loadPrets() {
-            ajax('GET', '/allPret', {}, (response) => {
-                const tbody = document.querySelector('#pret-table tbody');
-                tbody.innerHTML = '';
-                response.forEach(pret => {
+        function loadFunds() {
+            console.log("Chargement des fonds...");
+            ajax('GET', '/etablissementFonds', null, (data) => {
+                console.log("Données reçues:", data);
+                const fundsList = document.querySelector('#funds-list tbody');
+                fundsList.innerHTML = '';
+                if (data.length === 0) {
+                    fundsList.textContent = 'Aucun fonds trouvé.';
+                    return;
+                }
+                data.forEach(fund => {
                     const tr = document.createElement('tr');
                     tr.innerHTML = `
-                        <td>${pret.pid}</td>
-                        <td>${pret.cid}</td>
-                        <td>${pret.id_pret_type}</td>
-                        <td>${pret.montant}</td>
-                        <td>${new Date(pret.date).toLocaleDateString()}</td>
-                        <td><button onclick="returnBook(${pret.pid})">Retour</button></td>
+                        <td>${fund.id}</td>
+                        <td>${fund.id_etab}</td>
+                        <td>${fund.montant}</td>
+                        <td>${fund.date}</td>
+                        <td>${fund.libelle}</td>
+                        <td>En cours</td>
+                        <td><button onclick="validerFonds(${fund.id}, '${fund.date}')">Valider</button></td>
                     `;
-                    tbody.appendChild(tr);
+                    fundsList.appendChild(tr);
                 });
-
-                // Activer filtre dynamique après chargement
-                filterPrets();
             });
         }
 
-        document.querySelector('#pret-form').addEventListener('submit', function(event) {
-            event.preventDefault();
-            const id_client = document.querySelector('#client_id').value;
-            const id_pret_type = document.querySelector('#type_pret').value;
-            const montant = document.querySelector('#montant').value;
-            const date = document.querySelector('#date_pret').value;
-
-            ajax('POST', '/create_pret', { id_client, id_pret_type, montant, date }, (response) => {
-                if (response.success) {
-                    alert('Prêt ajouté avec succès');
-                    loadPrets();
-                } else {
-                    alert('Erreur : ' + response.error);
+        function loadValidFunds() {
+            console.log("Chargement des fonds valides...");
+            ajax('GET', '/fondValidation', null, (data) => {
+                console.log("Données reçues:", data);
+                const validFundsList = document.querySelector('#valid-funds-list tbody');
+                validFundsList.innerHTML = '';
+                if (data.length === 0) {
+                    validFundsList.textContent = 'Aucun fonds valide trouvé.';
+                    return;
                 }
+                data.forEach(fund => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td>${fund.id}</td>
+                        <td>${fund.id_etab_fond}</td>
+                        <td>${fund.montant}</td>
+                        <td>Valide</td>
+                        <td>${fund.date}</td>
+                    `;
+                    validFundsList.appendChild(tr);
+                });
+            });
+        }
+
+        function validerFonds(id,daty) {
+            console.log("Validation du fonds avec ID:", id);
+            ajax('POST', '/fondValidation', { id_etab_fond: id , date:daty }, (response) => {
+                console.log("Fonds validé:", response);
+                loadFunds();
+                loadValidFunds();
+            });
+        }
+
+        document.querySelector('form').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const idEtab = document.getElementById('fund-id-etab').value;
+            const montant = document.getElementById('fund-montant').value;
+            const date = document.getElementById('fund-date').value;
+            const libelle = document.getElementById('fund-name').value;
+
+            ajax('POST', '/etablissementFonds', { id_etab: idEtab, montant, date, libelle }, (response) => {
+                console.log("Fonds ajouté:", response);
+                loadFunds();
+                this.reset();
             });
         });
 
-        function returnBook(pretId) {
-            const dateRetour = prompt("Entrez la date de retour (YYYY-MM-DD):");
-            const monPayer = prompt("Entrez le montant du retour:");
-            if (dateRetour) {
-                ajax('POST', '/retourPret', { id_pret: pretId, montant: monPayer, date: dateRetour }, (response) => {
-                    if (response.success) {
-                        alert('Prêt retourné avec succès');
-                        loadPrets();
-                    } else {
-                        alert('Erreur : ' + response.error);
-                    }
-                });
-            } 
-        }
-
-        // Filtrage dynamique de la liste des prêts
-        function filterPrets() {
-            const input = document.querySelector('#filter');
-            input.addEventListener('input', () => {
-                const value = input.value.toLowerCase();
-                const rows = document.querySelectorAll('#pret-table tbody tr');
-                rows.forEach(row => {
-                    const text = row.textContent.toLowerCase();
-                    row.style.display = text.includes(value) ? '' : 'none';
-                });
-            });
-        }
-
-        // Initialisation
-        loadTypePrets();
-        loadClients();
-        loadPrets();
+        loadFunds();
+        loadValidFunds();
     </script>
 </body>
 </html>

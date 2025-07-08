@@ -163,21 +163,22 @@
         });
 
 
-        // function returnBook(pretId) {
-        //     const dateRetour = prompt("Entrez la date de retour (YYYY-MM-DD):");
-        //     const montantRetour = prompt("Entrez le montant du retour:");
-        //     ajax('POST', '/retourPret', { id_client_pret: pretId, montant: montantRetour, date: dateRetour }, (response) => {
-        //         if (response.success) {
-        //             alert('Prêt retourné avec succès');
-        //             loadPrets();
-        //         } else {
-        //             alert('Erreur : ' + response.error);
-        //         }
-        //     });
-        // }
+        function returnBook(pretId) {
+            const dateRetour = prompt("Entrez la date de retour (YYYY-MM-DD):");
+            const montantRetour = prompt("Entrez le montant du retour:");
+            ajax('POST', '/retourPret', { id_client_pret: pretId, montant: montantRetour, date: dateRetour }, (response) => {
+                if (response.success) {
+                    alert('Prêt retourné avec succès');
+                    loadPrets();
+                } else {
+                    alert('Erreur : ' + response.error);
+                }
+            });
+        }
 
         function loadRetours() {
             ajax('GET', '/retours', {}, (response) => {
+                // alert(JSON.stringify(response));
                 const retourTableBody = document.querySelector('#retour-table tbody');
                 retourTableBody.innerHTML = '';
                 response.forEach(retour => {
