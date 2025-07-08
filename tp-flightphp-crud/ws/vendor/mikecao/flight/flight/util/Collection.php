@@ -78,8 +78,8 @@ class Collection implements \ArrayAccess, \Iterator, \Countable, \JsonSerializab
      * @param string $offset Offset
      * @return mixed Value
      */
-    public function offsetGet($offset) {
-        return isset($this->data[$offset]) ? $this->data[$offset] : null;
+    public function offsetGet($offset): mixed {
+        return isset($this->items[$offset]) ? $this->items[$offset] : null;
     }
 
     /**
@@ -88,13 +88,8 @@ class Collection implements \ArrayAccess, \Iterator, \Countable, \JsonSerializab
      * @param string $offset Offset
      * @param mixed $value Value
      */
-    public function offsetSet($offset, $value) {
-        if (is_null($offset)) {
-            $this->data[] = $value;
-        }
-        else {
-            $this->data[$offset] = $value;
-        }
+    public function offsetSet($offset, $value): void {
+        $this->items[$offset] = $value;
     }
 
     /**
@@ -103,7 +98,7 @@ class Collection implements \ArrayAccess, \Iterator, \Countable, \JsonSerializab
      * @param string $offset Offset
      * @return bool Item status
      */
-    public function offsetExists($offset) {
+    public function offsetExists($offset): bool {
         return isset($this->data[$offset]);
     }
 
@@ -112,8 +107,8 @@ class Collection implements \ArrayAccess, \Iterator, \Countable, \JsonSerializab
      *
      * @param string $offset Offset
      */
-    public function offsetUnset($offset) {
-        unset($this->data[$offset]);
+    public function offsetUnset($offset): void {
+        unset($this->items[$offset]);
     }
 
     /**
